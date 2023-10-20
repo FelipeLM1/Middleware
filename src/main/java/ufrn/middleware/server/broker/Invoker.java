@@ -4,6 +4,8 @@ package ufrn.middleware.server.broker;
 public class Invoker {
 
 
-
+        //invoke before
+        // chamar objeto remoto
+        //invoke after -> interceptador
 
 }

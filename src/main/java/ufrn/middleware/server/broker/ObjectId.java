@@ -10,7 +10,7 @@ import java.util.Map;
 
 
 //OBJECT ID
-public class RemoteMethods {
+public class ObjectId {
 
     private static final Map<HttpMethod, Map<String, Method>> httpMethodMap;
 

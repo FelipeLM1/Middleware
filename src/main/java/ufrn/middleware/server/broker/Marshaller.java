@@ -8,3 +8,5 @@ public interface Marshaller {
 
     public JsonObject deserialize(String body) throws RemoteError;
 }
+
+

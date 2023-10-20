@@ -1,6 +1,6 @@
 package ufrn.middleware.server.start;
 
-import ufrn.middleware.server.broker.RemoteMethods;
+import ufrn.middleware.server.broker.ObjectId;
 
 public class RequestMappingHandlerMapping {
     public static void init() {
@@ -14,7 +14,7 @@ public class RequestMappingHandlerMapping {
 
     private static void searchHttpMethods() {
         ScannerRequestMethods.scanAndAddMethods("ufrn.app.controller");
-        RemoteMethods.printRegisteredMethods();
+        ObjectId.printRegisteredMethods();
 
     }
 }

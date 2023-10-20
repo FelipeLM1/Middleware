@@ -2,7 +2,7 @@ package ufrn.middleware.server;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ufrn.middleware.server.start.MidwayApplication;
+import ufrn.middleware.server.start.MiddlewareApplication;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,7 +13,7 @@ import java.net.Socket;
 
 public class ServerRequestHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(MidwayApplication.class);
+    private static final Logger logger = LoggerFactory.getLogger(MiddlewareApplication.class);
 
     public static void start(long startTime) {
         logger.info("Iniciando o server...");

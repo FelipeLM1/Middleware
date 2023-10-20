@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import ufrn.middleware.annotations.GetMapping;
 import ufrn.middleware.annotations.PostMapping;
 import ufrn.middleware.annotations.RequestHttpMapping;
-import ufrn.middleware.server.broker.RemoteMethods;
+import ufrn.middleware.server.broker.ObjectId;
 import ufrn.middleware.server.utils.enums.HttpMethod;
 
 import java.io.BufferedReader;
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 public class ScannerRequestMethods {
 
-    private static final Logger logger = LoggerFactory.getLogger(MidwayApplication.class);
+    private static final Logger logger = LoggerFactory.getLogger(MiddlewareApplication.class);
 
     public static Set<Class> findAllClassesUsingClassLoader(String packageName) {
         InputStream stream = ClassLoader.getSystemClassLoader()
@@ -58,7 +58,7 @@ public class ScannerRequestMethods {
     private static void addRequestMethod(HttpMethod httpMethod, Annotation annotation, Method method) {
         if (annotation instanceof GetMapping || annotation instanceof PostMapping) {
             String value = getMappingValue(annotation);
-            RemoteMethods.addMethod(httpMethod, value, method);
+            ObjectId.addMethod(httpMethod, value, method);
         }
     }
 

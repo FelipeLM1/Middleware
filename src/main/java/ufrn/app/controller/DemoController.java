@@ -4,11 +4,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ufrn.middleware.annotations.GetMapping;
 import ufrn.middleware.annotations.PostMapping;
-import ufrn.middleware.server.start.MidwayApplication;
+import ufrn.middleware.server.start.MiddlewareApplication;
 
 public class DemoController {
 
-    private static final Logger logger = LoggerFactory.getLogger(MidwayApplication.class);
+    private static final Logger logger = LoggerFactory.getLogger(MiddlewareApplication.class);
 
     @GetMapping
     public void getTest() {
