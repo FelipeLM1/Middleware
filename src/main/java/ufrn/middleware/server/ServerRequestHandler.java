@@ -2,6 +2,7 @@ package ufrn.middleware.server;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ufrn.middleware.server.start.MidwayApplication;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -10,14 +11,20 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class MidwayWebServer {
+public class ServerRequestHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(MidwayApplication.class);
 
-    public static void start() {
+    public static void start(long startTime) {
+        logger.info("Iniciando o server...");
         int port = 8080;
         try (ServerSocket serverSocket = new ServerSocket(port)) {
-            logger.info("Servidor HTTP simples está rodando na porta {}", port);
+            logger.info("Servidor HTTP está rodando na porta {}", port);
+            long endTime = System.currentTimeMillis();
+            long duration = endTime - startTime;
+
+            logger.info("Servidor disponivel em {} milissegundos ", duration);
+
 
             while (true) {
                 Socket clientSocket = serverSocket.accept();
