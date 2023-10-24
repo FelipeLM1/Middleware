@@ -1,7 +1,7 @@
-package ufrn.middleware.server.broker;
+package ufrn.middleware.server;
 
 import com.google.gson.JsonObject;
-import ufrn.middleware.server.broker.exceptions.RemoteError;
+import ufrn.middleware.exceptions.RemoteError;
 
 public interface Marshaller {
     public byte[] serialize(JsonObject message);

@@ -1,4 +1,4 @@
-package ufrn.middleware.server.utils.enums;
+package ufrn.middleware.utils.enums;
 
 public enum HttpMethod {
     GET, POST;

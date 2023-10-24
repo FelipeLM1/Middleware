@@ -1,4 +1,4 @@
-package ufrn.middleware.server.broker;
+package ufrn.middleware.methods;
 
 //chama o remote methods
 public class Invoker {

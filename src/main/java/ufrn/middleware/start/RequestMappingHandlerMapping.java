@@ -1,6 +1,6 @@
-package ufrn.middleware.server.start;
+package ufrn.middleware.start;
 
-import ufrn.middleware.server.broker.ObjectId;
+import ufrn.middleware.methods.ObjectId;
 
 public class RequestMappingHandlerMapping {
     public static void init() {

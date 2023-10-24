@@ -1,4 +1,4 @@
-package ufrn.middleware.server.broker.exceptions;
+package ufrn.middleware.exceptions;
 
 public class RemoteError extends RuntimeException {
     public String error;

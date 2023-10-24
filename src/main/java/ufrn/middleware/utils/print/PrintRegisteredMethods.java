@@ -1,9 +1,9 @@
-package ufrn.middleware.server.utils.enums.print;
+package ufrn.middleware.utils.print;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ufrn.middleware.server.start.MiddlewareApplication;
-import ufrn.middleware.server.utils.enums.HttpMethod;
+import ufrn.middleware.start.MiddlewareApplication;
+import ufrn.middleware.utils.enums.HttpMethod;
 
 import java.lang.reflect.Method;
 import java.util.Map;

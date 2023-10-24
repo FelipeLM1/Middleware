@@ -2,7 +2,9 @@ package ufrn.middleware.server;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ufrn.middleware.server.start.MiddlewareApplication;
+import ufrn.middleware.configuration.ApplicationPropertiesReader;
+import ufrn.middleware.start.MiddlewareApplication;
+import ufrn.middleware.utils.enums.MiddlewareProperties;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -17,7 +19,8 @@ public class ServerRequestHandler {
 
     public static void start(long startTime) {
         logger.info("Iniciando o server...");
-        int port = 8080;
+        int port = Integer.parseInt(MiddlewareProperties.PORT.getValue());
+
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             logger.info("Servidor HTTP está rodando na porta {}", port);
             long endTime = System.currentTimeMillis();

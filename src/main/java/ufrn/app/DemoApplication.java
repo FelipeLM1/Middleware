@@ -1,6 +1,6 @@
 package ufrn.app;
 
-import ufrn.middleware.server.start.MiddlewareApplication;
+import ufrn.middleware.start.MiddlewareApplication;
 
 public class DemoApplication {
 

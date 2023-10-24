@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ufrn.middleware.annotations.GetMapping;
 import ufrn.middleware.annotations.PostMapping;
-import ufrn.middleware.server.start.MiddlewareApplication;
+import ufrn.middleware.start.MiddlewareApplication;
 
 public class DemoController {
 

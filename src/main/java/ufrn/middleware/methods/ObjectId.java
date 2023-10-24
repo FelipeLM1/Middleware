@@ -1,7 +1,7 @@
-package ufrn.middleware.server.broker;
+package ufrn.middleware.methods;
 
-import ufrn.middleware.server.utils.enums.HttpMethod;
-import ufrn.middleware.server.utils.enums.print.PrintRegisteredMethods;
+import ufrn.middleware.utils.enums.HttpMethod;
+import ufrn.middleware.utils.print.PrintRegisteredMethods;
 
 import java.lang.reflect.Method;
 import java.util.EnumMap;

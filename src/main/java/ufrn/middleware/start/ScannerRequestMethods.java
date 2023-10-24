@@ -1,12 +1,12 @@
-package ufrn.middleware.server.start;
+package ufrn.middleware.start;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ufrn.middleware.annotations.GetMapping;
 import ufrn.middleware.annotations.PostMapping;
 import ufrn.middleware.annotations.RequestHttpMapping;
-import ufrn.middleware.server.broker.ObjectId;
-import ufrn.middleware.server.utils.enums.HttpMethod;
+import ufrn.middleware.methods.ObjectId;
+import ufrn.middleware.utils.enums.HttpMethod;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
