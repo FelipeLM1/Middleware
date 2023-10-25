@@ -12,15 +12,39 @@ import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.Objects;
 
-//chama o objectID
+/**
+ * Utility class for invoking methods in controllers based on HTTP requests.
+ *
+ * <p>The {@code Invoker} class is responsible for invoking methods in controllers based
+ * on the provided HTTP method and request parameters. It assumes that the controller methods
+ * adhere to specific constraints:
+ * - Each method should have a single parameter annotated with {@link RequestBody}.
+ *
+ * <p>Usage:
+ * <pre>
+ * // Create a request parameter object with the HTTP method and request details
+ * RequestParam requestParam = new RequestParam(HttpMethod.POST, "/example", requestBodyJson);
+ *
+ * // Invoke the method associated with the request
+ * Invoker.invoke(requestParam);
+ * </pre>
+ *
+ * @see RequestParam
+ * @see RequestBody
+ */
 public class Invoker {
+
+    private Invoker() {
+        throw new IllegalStateException("Utility class");
+    }
 
     /**
      * Restrições:
      * Os métodos dos controllers devem ter apenas um atributo com uma anotação @RequestBody.
      **/
-    public static void invoke(HttpMethod httpMethod, RequestParam requestParam) {
+    public static void invoke(RequestParam requestParam) {
 
+        var httpMethod = requestParam.httpMethod();
         var path = requestParam.path();
         var jsonString = requestParam.jsonString();
 

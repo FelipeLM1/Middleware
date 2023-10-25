@@ -16,11 +16,30 @@ import java.lang.reflect.Method;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * A utility class for scanning and registering request handling methods in the specified package.
+ *
+ * <p>The `ScannerRequestMethods` class provides utility methods for scanning classes in a specified package,
+ * searching for request handling methods, and registering them for the Middleware application. It is used to
+ * locate and register methods annotated with request mapping annotations such as `GetMapping` and `PostMapping`.
+ *
+ * @see GetMapping
+ * @see PostMapping
+ */
 public class ScannerRequestMethods {
 
-    private static final Logger logger = LoggerFactory.getLogger(MiddlewareApplication.class);
+    private ScannerRequestMethods() {
+        throw new IllegalStateException("Utility class");
+    }
 
-    public static Set<Class> findAllClassesUsingClassLoader(String packageName) {
+    private static final Logger logger = LoggerFactory.getLogger(ScannerRequestMethods.class);
+
+    public static void scanAndAddMethods(String basePackage) {
+        findAllClassesUsingClassLoader(basePackage).forEach(ScannerRequestMethods::scanMethodsForAnnotations);
+    }
+
+
+    private static Set<Class> findAllClassesUsingClassLoader(String packageName) {
         InputStream stream = ClassLoader.getSystemClassLoader()
                 .getResourceAsStream(packageName.replaceAll("[.]", "/"));
         BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
@@ -40,9 +59,6 @@ public class ScannerRequestMethods {
         return null;
     }
 
-    public static void scanAndAddMethods(String basePackage) {
-        findAllClassesUsingClassLoader(basePackage).forEach(ScannerRequestMethods::scanMethodsForAnnotations);
-    }
 
     private static void scanMethodsForAnnotations(Class<?> clazz) {
         for (Method method : clazz.getDeclaredMethods()) {

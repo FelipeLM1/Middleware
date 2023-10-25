@@ -4,7 +4,7 @@ import ufrn.middleware.configuration.ApplicationPropertiesReader;
 
 public enum MiddlewareProperties {
 
-    PORT("middleware.port");
+    PORT("middleware.port"), SCAN("middleware.scan");
 
     private String propertyKey;
 

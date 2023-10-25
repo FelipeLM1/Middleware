@@ -10,7 +10,22 @@ import java.util.Map;
 import java.util.Optional;
 
 
-//OBJECT ID
+/**
+ * Utility class for mapping HTTP methods to request paths and associated methods.
+ *
+ * <p>The {@code ObjectId} class is used to map HTTP methods (such as GET and POST)
+ * to request paths and the corresponding Java methods. It provides a data structure
+ * that allows efficient lookup and dispatch of methods based on HTTP method and request path.
+ *
+ * <p>Usage:
+ * <pre>
+ * // Retrieve a method associated with a specific HTTP method and path
+ * Method method = ObjectId.getMethod(HttpMethod.GET, "/example");
+ * </pre>
+ *
+ * @see HttpMethod
+ * @see Method
+ */
 public class ObjectId {
 
     private static final Map<HttpMethod, Map<String, Method>> httpMethodMap;

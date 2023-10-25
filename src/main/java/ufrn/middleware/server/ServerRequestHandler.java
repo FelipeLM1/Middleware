@@ -14,10 +14,22 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+/**
+ * A component responsible for handling incoming HTTP requests in the Middleware application.
+ *
+ * <p>The `ServerRequestHandler` class is a critical component of the Middleware application responsible for
+ * processing and handling incoming HTTP requests. It manages the lifecycle of request handling and response
+ * generation, making it a central part of the application's functionality.
+ */
 public class ServerRequestHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(MiddlewareApplication.class);
 
+    /**
+     * Starts the server request handling and processing.
+     *
+     * @param startTime The timestamp when the server request handling started.
+     */
     public static void start(long startTime) {
         logger.info("Iniciando o server...");
         int port = Integer.parseInt(MiddlewareProperties.PORT.getValue());
@@ -68,7 +80,7 @@ public class ServerRequestHandler {
     private static void handleGetRequest(PrintWriter out, String path) {
         String response = "HTTP/1.1 200 OK\r\n\r\n";
         response += "Hello, World!";
-        Invoker.invoke(HttpMethod.GET, new RequestParam(path, null));
+        Invoker.invoke(new RequestParam(HttpMethod.GET, path, null));
         out.print(response);
         out.flush();
     }
@@ -95,7 +107,7 @@ public class ServerRequestHandler {
                 if (bytesRead == contentLength) {
                     String requestBody = new String(buffer);
 
-                    Invoker.invoke(HttpMethod.POST, new RequestParam(path, requestBody));
+                    Invoker.invoke(new RequestParam(HttpMethod.POST, path, requestBody));
                     sendPostResponse(out);
                 } else {
                     handleContentLengthMismatch(out);
