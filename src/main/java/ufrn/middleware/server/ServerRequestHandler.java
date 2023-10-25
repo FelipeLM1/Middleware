@@ -3,7 +3,6 @@ package ufrn.middleware.server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ufrn.middleware.methods.Invoker;
-import ufrn.middleware.start.MiddlewareApplication;
 import ufrn.middleware.utils.enums.HttpMethod;
 import ufrn.middleware.utils.enums.MiddlewareProperties;
 
@@ -23,7 +22,11 @@ import java.net.Socket;
  */
 public class ServerRequestHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(MiddlewareApplication.class);
+    private ServerRequestHandler() {
+        throw new IllegalStateException("Utility class");
+    }
+
+    private static final Logger logger = LoggerFactory.getLogger(ServerRequestHandler.class);
 
     /**
      * Starts the server request handling and processing.
