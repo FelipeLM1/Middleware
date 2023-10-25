@@ -59,9 +59,12 @@ public class Invoker {
 
                 if (httpMethod.equals(HttpMethod.POST) && Objects.nonNull(jsonString)) {
                     args = getRequestBodyParam(method, jsonString);
+                    method.invoke(obj, args);
+                }else if(Objects.isNull(jsonString)){
+                    method.invoke(obj);
                 }
 
-                method.invoke(obj, args);
+
             }
 
         } catch (InvocationTargetException | IllegalAccessException e) {

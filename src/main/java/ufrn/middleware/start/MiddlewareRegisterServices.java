@@ -14,7 +14,11 @@ import org.slf4j.LoggerFactory;
  */
 public class MiddlewareRegisterServices {
 
-    private static final Logger logger = LoggerFactory.getLogger(MiddlewareApplication.class);
+    private MiddlewareRegisterServices() {
+        throw new IllegalStateException("Utility class");
+    }
+
+    private static final Logger logger = LoggerFactory.getLogger(MiddlewareRegisterServices.class);
 
     public static void start() {
         logger.info("Registrando os servicos...");
