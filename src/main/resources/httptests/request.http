@@ -8,3 +8,13 @@ Content-Type: application/json
   "id": 999,
   "value": "content"
 }
+
+### Send POST request with json body
+POST http://localhost:8080/postTest
+Content-Type: application/json
+
+{
+  "id": 1,
+  "value": "felipe",
+  "number": 3.14
+}

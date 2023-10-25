@@ -2,8 +2,9 @@ package ufrn.middleware.server;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ufrn.middleware.configuration.ApplicationPropertiesReader;
+import ufrn.middleware.methods.Invoker;
 import ufrn.middleware.start.MiddlewareApplication;
+import ufrn.middleware.utils.enums.HttpMethod;
 import ufrn.middleware.utils.enums.MiddlewareProperties;
 
 import java.io.BufferedReader;
@@ -41,64 +42,115 @@ public class ServerRequestHandler {
     private static void handleRequest(Socket clientSocket) {
         try (BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
              PrintWriter out = new PrintWriter(clientSocket.getOutputStream())) {
+
             String requestLine = in.readLine();
-            String[] requestParts = requestLine.split(" ");
-            String method = requestParts[0];
-            String path = requestParts[1];
             logger.info(requestLine);
 
-            if (method.equals("GET") && path.equals("/")) {
-                // Página inicial
-                String response = "HTTP/1.1 200 OK\r\n\r\n";
-                response += "Hello, World!";
-                out.print(response);
+            if (requestLine != null) {
+                String[] requestParts = requestLine.split(" ");
+                String method = requestParts[0];
+                String path = requestParts[1];
 
-            } else if (method.equals("POST") && path.equals("/")) {
-                // Lógica para manipular solicitação POST
-
-                // Ler cabeçalhos
-                String line;
-                int contentLength = -1; // Valor Content-Length inicializado como -1
-
-                while ((line = in.readLine()) != null && !line.isEmpty()) {
-                    // Verifique se a linha começa com "Content-Length:"
-                    if (line.startsWith("Content-Length: ")) {
-                        contentLength = Integer.parseInt(line.substring("Content-Length: ".length()));
-                    }
-                }
-
-                if (contentLength > 0) {
-                    // Agora que temos o Content-Length, leia o corpo
-                    char[] buffer = new char[contentLength];
-                    int bytesRead = in.read(buffer);
-
-                    if (bytesRead == contentLength) {
-                        // O buffer agora contém o corpo da solicitação
-                        String requestBody = new String(buffer);
-
-                        // Aqui, você pode processar o requestBody conforme necessário
-                        System.out.println("Solicitação POST com corpo: " + requestBody);
-                    }  // Trate a situação em que a quantidade de bytes lidos não corresponde ao Content-Length
-
+                if ("GET".equals(method)) {
+                    handleGetRequest(out, path);
+                } else if ("POST".equals(method)) {
+                    handlePostRequest(in, out, path);
                 } else {
-                    logger.error("É necessário o contentLength no cabeçalho!");
+                    handleNotFound(out);
                 }
-
-                // Responda ao cliente
-                String response = "HTTP/1.1 200 OK\r\n\r\n";
-                response += "Solicitação POST processada com sucesso.";
-                out.print(response);
-            } else {
-                // Página não encontrada para outros métodos ou caminhos
-                String response = "HTTP/1.1 404 Not Found\r\n\r\n";
-                response += "Página não encontrada";
-                out.print(response);
             }
 
-            out.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    private static void handleGetRequest(PrintWriter out, String path) {
+        String response = "HTTP/1.1 200 OK\r\n\r\n";
+        response += "Hello, World!";
+        Invoker.invoke(HttpMethod.GET, new RequestParam(path, null));
+        out.print(response);
+        out.flush();
+    }
+
+    private static void handlePostRequest(BufferedReader in, PrintWriter out, String path) throws IOException {
+        String contentLengthHeader = readContentLengthHeader(in);
+        int contentLength;
+
+        while (true) {
+            var line = in.readLine();
+            if (line == null || line.isEmpty()) {
+                break;
+            }
+        }
+
+
+        if (contentLengthHeader != null) {
+            contentLength = Integer.parseInt(contentLengthHeader);
+
+            if (contentLength > 0) {
+                char[] buffer = new char[contentLength];
+                int bytesRead = in.read(buffer);
+
+                if (bytesRead == contentLength) {
+                    String requestBody = new String(buffer);
+
+                    Invoker.invoke(HttpMethod.POST, new RequestParam(path, requestBody));
+                    sendPostResponse(out);
+                } else {
+                    handleContentLengthMismatch(out);
+                }
+            } else {
+                handleMissingContentLength(out);
+            }
+        } else {
+            handleMissingContentLengthHeader(out);
+        }
+    }
+
+    private static String readContentLengthHeader(BufferedReader in) throws IOException {
+        String line;
+        while ((line = in.readLine()) != null && !line.isEmpty()) {
+            if (line.startsWith("Content-Length: ")) {
+                return line.substring("Content-Length: ".length());
+            }
+        }
+        return null;
+    }
+
+    private static void sendPostResponse(PrintWriter out) {
+        String response = "HTTP/1.1 200 OK\r\n\r\n";
+        response += "Solicitação POST processada com sucesso.";
+        out.print(response);
+        out.flush();
+    }
+
+    private static void handleContentLengthMismatch(PrintWriter out) {
+        logger.error("A quantidade de bytes lidos não corresponde ao Content-Length.");
+        handleServerError(out);
+    }
+
+    private static void handleMissingContentLength(PrintWriter out) {
+        logger.error("É necessário o Content-Length no cabeçalho.");
+        handleServerError(out);
+    }
+
+    private static void handleMissingContentLengthHeader(PrintWriter out) {
+        logger.error("Cabeçalho Content-Length ausente.");
+        handleServerError(out);
+    }
+
+    private static void handleNotFound(PrintWriter out) {
+        String response = "HTTP/1.1 404 Not Found\r\n\r\n";
+        response += "Página não encontrada";
+        out.print(response);
+        out.flush();
+    }
+
+    private static void handleServerError(PrintWriter out) {
+        String response = "HTTP/1.1 500 Internal Server Error\r\n\r\n";
+        response += "Ocorreu um erro interno no servidor.";
+        out.print(response);
+        out.flush();
+    }
 }

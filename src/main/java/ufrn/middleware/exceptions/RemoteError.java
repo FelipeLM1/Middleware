@@ -1,8 +1,13 @@
 package ufrn.middleware.exceptions;
 
 public class RemoteError extends RuntimeException {
-    public String error;
-    public int code;
+    private String error;
+    private int code;
+
+    public RemoteError(String error, int code) {
+        this.error = error;
+        this.code = code;
+    }
 
     public String getError() {
         return error;

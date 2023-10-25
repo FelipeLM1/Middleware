@@ -6,7 +6,7 @@ import ufrn.middleware.exceptions.RemoteError;
 public interface Marshaller {
     public byte[] serialize(JsonObject message);
 
-    public JsonObject deserialize(String body) throws RemoteError;
+    public Object deserialize(String body, Class<?> clazz) throws RemoteError;
 }
 
 

@@ -7,6 +7,7 @@ import java.lang.reflect.Method;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 
 //OBJECT ID
@@ -25,11 +26,11 @@ public class ObjectId {
         httpMethodMap.get(httpMethod).put(path, method);
     }
 
-    public static Method getMethod(HttpMethod httpMethod, String path) {
+    public static Optional<Method> getMethod(HttpMethod httpMethod, String path) {
         if (httpMethodMap.containsKey(httpMethod)) {
-            return httpMethodMap.get(httpMethod).get(path);
+            return Optional.of(httpMethodMap.get(httpMethod).get(path));
         }
-        return null;
+        return Optional.empty();
     }
 
     public static void printRegisteredMethods() {
