@@ -2,18 +2,13 @@ package ufrn.middleware.server;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ufrn.middleware.configuration.AcquisitionType;
 import ufrn.middleware.configuration.LifecyclePattern;
 import ufrn.middleware.configuration.MiddlewareProperties;
-import ufrn.middleware.methods.Invoker;
-import ufrn.middleware.methods.InvokerPerRequest;
-import ufrn.middleware.methods.ObjectIdPerRequest;
+import ufrn.middleware.methods.perRequestLifecycle.ObjectIdPerRequest;
 import ufrn.middleware.start.ScannerPerRequest;
-import ufrn.middleware.utils.enums.HttpMethod;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Optional;
@@ -52,7 +47,8 @@ public class ServerRequestHandler {
             var i = 0;
             while (true) {
                 Socket clientSocket = serverSocket.accept();
-                Thread.ofVirtual().name("VThread: " + i).start(() -> handleRequest(clientSocket, LifecyclePattern.getLifecyclePattern()));
+                Thread.ofVirtual().name("VThread: " + i)
+                        .start(() -> handleRequest(clientSocket, LifecyclePattern.getLifecyclePattern()));
                 i++;
             }
         } catch (IOException e) {
@@ -63,151 +59,14 @@ public class ServerRequestHandler {
     private static void handleRequest(Socket clientSocket, LifecyclePattern lifecyclePattern) {
         Optional<ObjectIdPerRequest> objectIdPerRequest = Optional.empty();
 
+        var acquisitionType = AcquisitionType.valueOf(MiddlewareProperties.ACQUISITION_TYPE.getValue());
+
         if (LifecyclePattern.PER_REQUEST.equals(lifecyclePattern)) {
             objectIdPerRequest = Optional.of(new ObjectIdPerRequest());
-            var scanner = new ScannerPerRequest(objectIdPerRequest.get());
-            scanner.scanAndAddMethods();
-        }
-
-        try (BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-             PrintWriter out = new PrintWriter(clientSocket.getOutputStream())) {
-
-            String requestLine = in.readLine();
-            logger.info(requestLine);
-
-            if (requestLine != null) {
-                String[] requestParts = requestLine.split(" ");
-                String method = requestParts[0];
-                String path = requestParts[1];
-
-                if ("GET".equals(method)) {
-                    handleGetRequest(out, path, objectIdPerRequest);
-                } else if ("POST".equals(method)) {
-                    handlePostRequest(in, out, path, objectIdPerRequest);
-                } else {
-                    handleNotFound(out);
-                }
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static void handleGetRequest(
-            PrintWriter out,
-            String path,
-            Optional<ObjectIdPerRequest> optionalObjectIdPerRequest) {
-        String response = "HTTP/1.1 200 OK\r\n\r\n";
-        response += "Hello, World!";
-        var params = new RequestParam(HttpMethod.GET, path, null);
-
-
-        if (optionalObjectIdPerRequest.isPresent()) {
-            var invoker = new InvokerPerRequest(optionalObjectIdPerRequest.get());
-            logger.info("Novo Invoker!");
-            invoker.invoke(params);
-
-        } else {
-            logger.info("Invoker Estático!");
-            Invoker.invoke(params);
-        }
-        out.print(response);
-        out.flush();
-    }
-
-    private static void handlePostRequest(
-            BufferedReader in,
-            PrintWriter out,
-            String path, Optional<ObjectIdPerRequest> optionalObjectIdPerRequest)
-            throws IOException {
-
-        String contentLengthHeader = readContentLengthHeader(in);
-        int contentLength;
-
-        while (true) {
-            var line = in.readLine();
-            if (line == null || line.isEmpty()) {
-                break;
+            if (acquisitionType.equals(AcquisitionType.EAGER)) {
+                new ScannerPerRequest(objectIdPerRequest.get());
             }
         }
-
-
-        if (contentLengthHeader != null) {
-            contentLength = Integer.parseInt(contentLengthHeader);
-
-            if (contentLength > 0) {
-                char[] buffer = new char[contentLength];
-                int bytesRead = in.read(buffer);
-
-                if (bytesRead == contentLength) {
-                    String requestBody = new String(buffer);
-                    var params = new RequestParam(HttpMethod.POST, path, requestBody);
-                    if (optionalObjectIdPerRequest.isPresent()) {
-                        var invoker = new InvokerPerRequest(optionalObjectIdPerRequest.get());
-                        logger.info("Novo Invoker!");
-                        invoker.invoke(params);
-
-                    } else {
-                        logger.info("Invoker Estático!");
-                        Invoker.invoke(params);
-                    }
-
-                    sendPostResponse(out);
-                } else {
-                    handleContentLengthMismatch(out);
-                }
-            } else {
-                handleMissingContentLength(out);
-            }
-        } else {
-            handleMissingContentLengthHeader(out);
-        }
-    }
-
-    private static String readContentLengthHeader(BufferedReader in) throws IOException {
-        String line;
-        while ((line = in.readLine()) != null && !line.isEmpty()) {
-            if (line.startsWith("Content-Length: ")) {
-                return line.substring("Content-Length: ".length());
-            }
-        }
-        return null;
-    }
-
-    private static void sendPostResponse(PrintWriter out) {
-        String response = "HTTP/1.1 200 OK\r\n\r\n";
-        response += "Solicitação POST processada com sucesso.";
-        out.print(response);
-        out.flush();
-    }
-
-    private static void handleContentLengthMismatch(PrintWriter out) {
-        logger.error("A quantidade de bytes lidos não corresponde ao Content-Length.");
-        handleServerError(out);
-    }
-
-    private static void handleMissingContentLength(PrintWriter out) {
-        logger.error("É necessário o Content-Length no cabeçalho.");
-        handleServerError(out);
-    }
-
-    private static void handleMissingContentLengthHeader(PrintWriter out) {
-        logger.error("Cabeçalho Content-Length ausente.");
-        handleServerError(out);
-    }
-
-    private static void handleNotFound(PrintWriter out) {
-        String response = "HTTP/1.1 404 Not Found\r\n\r\n";
-        response += "Página não encontrada";
-        out.print(response);
-        out.flush();
-    }
-
-    private static void handleServerError(PrintWriter out) {
-        String response = "HTTP/1.1 500 Internal Server Error\r\n\r\n";
-        response += "Ocorreu um erro interno no servidor.";
-        out.print(response);
-        out.flush();
+        HandleHttpRequest.handleRequest(clientSocket, objectIdPerRequest);
     }
 }

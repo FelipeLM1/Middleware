@@ -1,4 +1,4 @@
-package ufrn.middleware.methods;
+package ufrn.middleware.methods.perRequestLifecycle;
 
 import ufrn.middleware.annotations.RequestBody;
 import ufrn.middleware.server.MarshallerImpl;

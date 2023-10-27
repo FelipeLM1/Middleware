@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import ufrn.middleware.annotations.GetMapping;
 import ufrn.middleware.annotations.PostMapping;
 import ufrn.middleware.annotations.RequestHttpMapping;
-import ufrn.middleware.methods.ObjectIdStatic;
+import ufrn.middleware.methods.staticLifecycle.ObjectIdStatic;
 import ufrn.middleware.utils.enums.HttpMethod;
 
 import java.io.BufferedReader;

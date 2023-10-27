@@ -6,7 +6,7 @@ import ufrn.middleware.annotations.GetMapping;
 import ufrn.middleware.annotations.PostMapping;
 import ufrn.middleware.annotations.RequestHttpMapping;
 import ufrn.middleware.configuration.MiddlewareProperties;
-import ufrn.middleware.methods.ObjectIdPerRequest;
+import ufrn.middleware.methods.perRequestLifecycle.ObjectIdPerRequest;
 import ufrn.middleware.utils.enums.HttpMethod;
 
 import java.io.BufferedReader;
@@ -24,10 +24,24 @@ public class ScannerPerRequest {
 
 
     public ScannerPerRequest(ObjectIdPerRequest objectIdPerRequest) {
+        logger.info("Scanner Per Request Eager iniciando...");
         this.objectIdPerRequest = objectIdPerRequest;
+        this.scanAndAddAllMethods();
     }
 
-    public void scanAndAddMethods() {
+    public ScannerPerRequest(ObjectIdPerRequest objectIdPerRequest, String reqMethod, String pathLazyMethod) {
+        logger.info("Scanner Per Request Lazy iniciando...");
+        this.objectIdPerRequest = objectIdPerRequest;
+        this.scanAndAddLazyMethod(reqMethod, pathLazyMethod);
+
+    }
+
+    private void scanAndAddLazyMethod(String httpMethodReq, String pathLazyMethod) {
+        this.findAllClassesUsingClassLoader(MiddlewareProperties.SCAN.getValue())
+                .forEach(aClass -> scanLazyMethodForAnnotations(aClass, httpMethodReq, pathLazyMethod));
+    }
+
+    public void scanAndAddAllMethods() {
         this.findAllClassesUsingClassLoader(MiddlewareProperties.SCAN.getValue()).forEach(this::scanMethodsForAnnotations);
     }
 
@@ -68,6 +82,32 @@ public class ScannerPerRequest {
             this.objectIdPerRequest.addMethod(httpMethod, value, method);
             logger.info("método per request adicionado: {}", method.getName());
         }
+    }
+
+    private void scanLazyMethodForAnnotations(Class<?> clazz, String httpMethodReq, String path) {
+        for (Method method : clazz.getDeclaredMethods()) {
+            for (Annotation annotation : method.getAnnotations()) {
+                if (annotation.annotationType().isAnnotationPresent(RequestHttpMapping.class)) {
+                    HttpMethod httpMethod = mapAnnotationToHttpMethod(annotation);
+                    if (httpMethodReq.equals(httpMethod.name())) {
+                        var findMethod = this.addLazyRequestMethod(httpMethod, annotation, method, path);
+                        if (findMethod) return;
+                    }
+                }
+            }
+        }
+    }
+
+    private boolean addLazyRequestMethod(HttpMethod httpMethod, Annotation annotation, Method method, String path) {
+        if (annotation instanceof GetMapping || annotation instanceof PostMapping) {
+            String value = getMappingValue(annotation);
+            if (value.equals(path)) {
+                this.objectIdPerRequest.addMethod(httpMethod, value, method);
+                logger.info("método Lazy per request adicionado: {}", method.getName());
+                return true;
+            }
+        }
+        return false;
     }
 
     private String getMappingValue(Annotation annotation) {

@@ -2,8 +2,10 @@ package ufrn.middleware.configuration;
 
 public enum MiddlewareProperties {
 
-    PORT("middleware.port"), SCAN("middleware.scan"),
-    LIFECYCLE_PATTERN("middleware.lifecycle.pattern");
+    PORT("middleware.port"),
+    SCAN("middleware.scan"),
+    LIFECYCLE_PATTERN("middleware.lifecycle.pattern"),
+    ACQUISITION_TYPE("middleware.lifecycle.acquisition-type");
 
     private final String propertyKey;
 

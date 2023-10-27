@@ -34,5 +34,4 @@ public class MiddlewareApplication {
         ServerRequestHandler.start(startTime);
     }
 
-
 }

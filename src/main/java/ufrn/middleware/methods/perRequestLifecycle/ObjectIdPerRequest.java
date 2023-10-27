@@ -1,4 +1,4 @@
-package ufrn.middleware.methods;
+package ufrn.middleware.methods.perRequestLifecycle;
 
 import ufrn.middleware.utils.enums.HttpMethod;
 import ufrn.middleware.utils.print.PrintRegisteredMethods;

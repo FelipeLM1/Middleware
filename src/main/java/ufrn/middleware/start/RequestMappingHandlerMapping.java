@@ -1,7 +1,7 @@
 package ufrn.middleware.start;
 
 import ufrn.middleware.configuration.ApplicationPropertiesReader;
-import ufrn.middleware.methods.ObjectIdStatic;
+import ufrn.middleware.methods.staticLifecycle.ObjectIdStatic;
 import ufrn.middleware.configuration.MiddlewareProperties;
 
 /**
