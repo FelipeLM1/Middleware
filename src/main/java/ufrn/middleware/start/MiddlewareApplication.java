@@ -2,6 +2,7 @@ package ufrn.middleware.start;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ufrn.middleware.configuration.LifecyclePattern;
 import ufrn.middleware.server.ServerRequestHandler;
 
 /**
@@ -15,17 +16,23 @@ import ufrn.middleware.server.ServerRequestHandler;
  */
 public class MiddlewareApplication {
 
+    private MiddlewareApplication() {
+        throw new IllegalStateException("Utility class");
+    }
+
     private static final Logger logger = LoggerFactory.getLogger(MiddlewareApplication.class);
 
     public static void run() {
+        MiddlewareBanner.printBanner();
         logger.info("Iniciando Middleware...");
         startApplication();
     }
 
     private static void startApplication() {
         var startTime = System.currentTimeMillis();
-        MiddlewareRegisterServices.start();
+        if (LifecyclePattern.isStaticInstances()) MiddlewareRegisterServices.start();
         ServerRequestHandler.start(startTime);
     }
+
 
 }
