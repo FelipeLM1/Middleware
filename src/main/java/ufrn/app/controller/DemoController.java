@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import ufrn.middleware.annotations.GetMapping;
 import ufrn.middleware.annotations.PostMapping;
 import ufrn.middleware.annotations.RequestBody;
-import ufrn.middleware.utils.enums.HttpMethod;
 
 public class DemoController {
 
