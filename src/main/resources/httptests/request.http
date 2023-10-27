@@ -18,3 +18,14 @@ Content-Type: application/json
   "value": "felipe",
   "number": 3.14
 }
+
+###
+POST http://localhost:8080/s3
+Content-Type: application/json
+
+{
+  "bucketName": "b1"
+}
+
+###
+GET http://localhost:8080/s3

@@ -13,23 +13,22 @@ public class DemoController {
     record TestRequest(long id, String value) {
     }
 
-    @GetMapping
-    public void getTest() {
-        logger.info("chegou na rota get");
-    }
 
     @GetMapping("/findAll")
     public void getTest2() {
         logger.info("chegou na rota get");
     }
 
-    @PostMapping
-    public void postTest(@RequestBody TestRequest request) {
-        logger.info("chegou na rota post");
-        logger.info("request: \n id: {} \n value: {}", request.id(), request.value());
+    record TestRequest2(long id, String value, float number) {
     }
 
-    record TestRequest2(long id, String value, float number) {
+    record uploadFileReq(String bucketName, String nameFile, byte[] data) {
+    }
+
+    @PostMapping("/postTest2")
+    public void postTest2(@RequestBody uploadFileReq request) {
+        logger.info("chegou na rota post 2");
+
     }
 
     @PostMapping("/postTest")
