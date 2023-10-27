@@ -26,7 +26,7 @@ import java.util.Optional;
  * @see HttpMethod
  * @see Method
  */
-public class ObjectId {
+public class ObjectIdStatic {
 
     private static final Map<HttpMethod, Map<String, Method>> httpMethodMap;
 

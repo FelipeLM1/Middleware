@@ -2,9 +2,13 @@ package ufrn.middleware.server;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ufrn.middleware.configuration.LifecyclePattern;
+import ufrn.middleware.configuration.MiddlewareProperties;
 import ufrn.middleware.methods.Invoker;
+import ufrn.middleware.methods.InvokerPerRequest;
+import ufrn.middleware.methods.ObjectIdPerRequest;
+import ufrn.middleware.start.ScannerPerRequest;
 import ufrn.middleware.utils.enums.HttpMethod;
-import ufrn.middleware.utils.enums.MiddlewareProperties;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,6 +16,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Optional;
 
 /**
  * A component responsible for handling incoming HTTP requests in the Middleware application.
@@ -44,17 +49,26 @@ public class ServerRequestHandler {
 
             logger.info("Servidor disponivel em {} milissegundos ", duration);
 
-
+            var i = 0;
             while (true) {
                 Socket clientSocket = serverSocket.accept();
-                Thread.ofVirtual().start(() -> handleRequest(clientSocket));
+                Thread.ofVirtual().name("VThread: " + i).start(() -> handleRequest(clientSocket, LifecyclePattern.getLifecyclePattern()));
+                i++;
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private static void handleRequest(Socket clientSocket) {
+    private static void handleRequest(Socket clientSocket, LifecyclePattern lifecyclePattern) {
+        Optional<ObjectIdPerRequest> objectIdPerRequest = Optional.empty();
+
+        if (LifecyclePattern.PER_REQUEST.equals(lifecyclePattern)) {
+            objectIdPerRequest = Optional.of(new ObjectIdPerRequest());
+            var scanner = new ScannerPerRequest(objectIdPerRequest.get());
+            scanner.scanAndAddMethods();
+        }
+
         try (BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
              PrintWriter out = new PrintWriter(clientSocket.getOutputStream())) {
 
@@ -67,9 +81,9 @@ public class ServerRequestHandler {
                 String path = requestParts[1];
 
                 if ("GET".equals(method)) {
-                    handleGetRequest(out, path);
+                    handleGetRequest(out, path, objectIdPerRequest);
                 } else if ("POST".equals(method)) {
-                    handlePostRequest(in, out, path);
+                    handlePostRequest(in, out, path, objectIdPerRequest);
                 } else {
                     handleNotFound(out);
                 }
@@ -80,15 +94,34 @@ public class ServerRequestHandler {
         }
     }
 
-    private static void handleGetRequest(PrintWriter out, String path) {
+    private static void handleGetRequest(
+            PrintWriter out,
+            String path,
+            Optional<ObjectIdPerRequest> optionalObjectIdPerRequest) {
         String response = "HTTP/1.1 200 OK\r\n\r\n";
         response += "Hello, World!";
-        Invoker.invoke(new RequestParam(HttpMethod.GET, path, null));
+        var params = new RequestParam(HttpMethod.GET, path, null);
+
+
+        if (optionalObjectIdPerRequest.isPresent()) {
+            var invoker = new InvokerPerRequest(optionalObjectIdPerRequest.get());
+            logger.info("Novo Invoker!");
+            invoker.invoke(params);
+
+        } else {
+            logger.info("Invoker Estático!");
+            Invoker.invoke(params);
+        }
         out.print(response);
         out.flush();
     }
 
-    private static void handlePostRequest(BufferedReader in, PrintWriter out, String path) throws IOException {
+    private static void handlePostRequest(
+            BufferedReader in,
+            PrintWriter out,
+            String path, Optional<ObjectIdPerRequest> optionalObjectIdPerRequest)
+            throws IOException {
+
         String contentLengthHeader = readContentLengthHeader(in);
         int contentLength;
 
@@ -109,8 +142,17 @@ public class ServerRequestHandler {
 
                 if (bytesRead == contentLength) {
                     String requestBody = new String(buffer);
+                    var params = new RequestParam(HttpMethod.POST, path, requestBody);
+                    if (optionalObjectIdPerRequest.isPresent()) {
+                        var invoker = new InvokerPerRequest(optionalObjectIdPerRequest.get());
+                        logger.info("Novo Invoker!");
+                        invoker.invoke(params);
 
-                    Invoker.invoke(new RequestParam(HttpMethod.POST, path, requestBody));
+                    } else {
+                        logger.info("Invoker Estático!");
+                        Invoker.invoke(params);
+                    }
+
                     sendPostResponse(out);
                 } else {
                     handleContentLengthMismatch(out);

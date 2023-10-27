@@ -1,13 +1,11 @@
-package ufrn.middleware.utils.enums;
-
-import ufrn.middleware.configuration.ApplicationPropertiesReader;
+package ufrn.middleware.configuration;
 
 public enum MiddlewareProperties {
 
     PORT("middleware.port"), SCAN("middleware.scan"),
-    LIFECYCLE;
+    LIFECYCLE_PATTERN("middleware.lifecycle.pattern");
 
-    private String propertyKey;
+    private final String propertyKey;
 
     MiddlewareProperties(String propertyKey) {
         this.propertyKey = propertyKey;
@@ -20,4 +18,5 @@ public enum MiddlewareProperties {
     public String getValue() {
         return ApplicationPropertiesReader.getProperty(this.propertyKey);
     }
+
 }

@@ -1,8 +1,8 @@
 package ufrn.middleware.start;
 
 import ufrn.middleware.configuration.ApplicationPropertiesReader;
-import ufrn.middleware.methods.ObjectId;
-import ufrn.middleware.utils.enums.MiddlewareProperties;
+import ufrn.middleware.methods.ObjectIdStatic;
+import ufrn.middleware.configuration.MiddlewareProperties;
 
 /**
  * A class responsible for initializing and managing the request mapping for the Middleware application.
@@ -13,7 +13,7 @@ import ufrn.middleware.utils.enums.MiddlewareProperties;
  * the registered methods using `ObjectId.printRegisteredMethods()`.
  *
  * @see ScannerRequestMethods
- * @see ObjectId
+ * @see ObjectIdStatic
  */
 public class RequestMappingHandlerMapping {
 
@@ -33,7 +33,7 @@ public class RequestMappingHandlerMapping {
 
     private static void searchHttpMethods() {
         ScannerRequestMethods.scanAndAddMethods(ApplicationPropertiesReader.getProperty(MiddlewareProperties.SCAN.getPropertyKey()));
-        ObjectId.printRegisteredMethods();
+        ObjectIdStatic.printRegisteredMethods();
 
     }
 }

@@ -12,44 +12,25 @@ import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.Objects;
 
-/**
- * Utility class for invoking methods in controllers based on HTTP requests.
- *
- * <p>The {@code Invoker} class is responsible for invoking methods in controllers based
- * on the provided HTTP method and request parameters. It assumes that the controller methods
- * adhere to specific constraints:
- * - Each method should have a single parameter annotated with {@link RequestBody}.
- *
- * <p>Usage:
- * <pre>
- * // Create a request parameter object with the HTTP method and request details
- * RequestParam requestParam = new RequestParam(HttpMethod.POST, "/example", requestBodyJson);
- *
- * // Invoke the method associated with the request
- * Invoker.invoke(requestParam);
- * </pre>
- *
- * @see RequestParam
- * @see RequestBody
- */
-public class Invoker {
-
-    private Invoker() {
-        throw new IllegalStateException("Utility class");
-    }
-
+public class InvokerPerRequest {
     /**
      * Restrições:
      * Os métodos dos controllers devem ter apenas um atributo com uma anotação @RequestBody.
      **/
-    public static void invoke(RequestParam requestParam) {
 
+    private final ObjectIdPerRequest objectIdPerRequest;
+
+    public InvokerPerRequest(ObjectIdPerRequest objectIdPerRequest) {
+        this.objectIdPerRequest = objectIdPerRequest;
+    }
+
+    public void invoke(RequestParam requestParam) {
         var httpMethod = requestParam.httpMethod();
         var path = requestParam.path();
         var jsonString = requestParam.jsonString();
 
         try {
-            var methodOpt = ObjectIdStatic.getMethod(httpMethod, path);
+            var methodOpt = objectIdPerRequest.getMethod(httpMethod, path);
             Class<?> clazz;
             Object args;
             if ((methodOpt.isPresent())) {
@@ -63,18 +44,15 @@ public class Invoker {
                 } else if (Objects.isNull(jsonString)) {
                     method.invoke(obj);
                 }
-
             }
-
         } catch (InvocationTargetException | IllegalAccessException e) {
             e.printStackTrace();
         } catch (InstantiationException | NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
-
     }
 
-    private static Object getRequestBodyParam(Method method, String jsonString) {
+    private Object getRequestBodyParam(Method method, String jsonString) {
         Parameter parameter = findAnnotatedParameter(method, RequestBody.class);
         if (parameter != null) {
             Class<?> parameterType = parameter.getType();
@@ -83,14 +61,11 @@ public class Invoker {
         return null;
     }
 
-    private static Parameter findAnnotatedParameter(Method method, Class<? extends Annotation> annotationType) {
+    private Parameter findAnnotatedParameter(Method method, Class<? extends Annotation> annotationType) {
         return Arrays.stream(method.getParameters())
                 .filter(parameter -> parameter.isAnnotationPresent(annotationType))
                 .findFirst()
                 .orElse(null);
     }
-    //invoke before
-    // chamar objeto remoto
-    //invoke after -> interceptador
-
 }
+
