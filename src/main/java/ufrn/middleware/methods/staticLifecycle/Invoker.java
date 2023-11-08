@@ -3,6 +3,7 @@ package ufrn.middleware.methods.staticLifecycle;
 import ufrn.middleware.annotations.RequestBody;
 import ufrn.middleware.server.MarshallerImpl;
 import ufrn.middleware.server.RequestParam;
+import ufrn.middleware.utils.ResponseEntity;
 import ufrn.middleware.utils.enums.HttpMethod;
 
 import java.lang.annotation.Annotation;
@@ -42,7 +43,7 @@ public class Invoker {
      * Restrições:
      * Os métodos dos controllers devem ter apenas um atributo com uma anotação @RequestBody.
      **/
-    public static void invoke(RequestParam requestParam) {
+    public static ResponseEntity<?> invoke(RequestParam requestParam) {
 
         var httpMethod = requestParam.httpMethod();
         var path = requestParam.path();
@@ -59,9 +60,9 @@ public class Invoker {
 
                 if (httpMethod.equals(HttpMethod.POST) && Objects.nonNull(jsonString)) {
                     args = getRequestBodyParam(method, jsonString);
-                    method.invoke(obj, args);
+                    return (ResponseEntity<?>) method.invoke(obj, args);
                 } else if (Objects.isNull(jsonString)) {
-                    method.invoke(obj);
+                    return (ResponseEntity<?>) method.invoke(obj);
                 }
 
             }
@@ -72,6 +73,7 @@ public class Invoker {
             throw new RuntimeException(e);
         }
 
+        return null;
     }
 
     private static Object getRequestBodyParam(Method method, String jsonString) {

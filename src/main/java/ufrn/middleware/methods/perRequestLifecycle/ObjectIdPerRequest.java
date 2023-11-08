@@ -26,7 +26,8 @@ public class ObjectIdPerRequest {
 
     public Optional<Method> getMethod(HttpMethod httpMethod, String path) {
         if (this.httpMethodMap.containsKey(httpMethod)) {
-            return Optional.of(this.httpMethodMap.get(httpMethod).get(path));
+            var method = this.httpMethodMap.get(httpMethod).get(path);
+            return Optional.ofNullable(method);
         }
         return Optional.empty();
     }

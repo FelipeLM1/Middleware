@@ -1,8 +1,11 @@
 package ufrn.middleware.methods.perRequestLifecycle;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ufrn.middleware.annotations.RequestBody;
 import ufrn.middleware.server.MarshallerImpl;
 import ufrn.middleware.server.RequestParam;
+import ufrn.middleware.utils.ResponseEntity;
 import ufrn.middleware.utils.enums.HttpMethod;
 
 import java.lang.annotation.Annotation;
@@ -18,13 +21,16 @@ public class InvokerPerRequest {
      * Os métodos dos controllers devem ter apenas um atributo com uma anotação @RequestBody.
      **/
 
+
+    private static final Logger logger = LoggerFactory.getLogger(InvokerPerRequest.class);
+
     private final ObjectIdPerRequest objectIdPerRequest;
 
     public InvokerPerRequest(ObjectIdPerRequest objectIdPerRequest) {
         this.objectIdPerRequest = objectIdPerRequest;
     }
 
-    public void invoke(RequestParam requestParam) {
+    public ResponseEntity<?> invoke(RequestParam requestParam) {
         var httpMethod = requestParam.httpMethod();
         var path = requestParam.path();
         var jsonString = requestParam.jsonString();
@@ -40,16 +46,19 @@ public class InvokerPerRequest {
 
                 if (httpMethod.equals(HttpMethod.POST) && Objects.nonNull(jsonString)) {
                     args = getRequestBodyParam(method, jsonString);
-                    method.invoke(obj, args);
+                    return (ResponseEntity<?>) method.invoke(obj, args);
                 } else if (Objects.isNull(jsonString)) {
-                    method.invoke(obj);
+                    return (ResponseEntity<?>) method.invoke(obj);
                 }
+            } else {
+                logger.warn("Não foi possível encontrar o método solicitado.");
             }
         } catch (InvocationTargetException | IllegalAccessException e) {
             e.printStackTrace();
         } catch (InstantiationException | NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
+        return null;
     }
 
     private Object getRequestBodyParam(Method method, String jsonString) {

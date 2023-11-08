@@ -6,6 +6,7 @@ import ufrn.app.repository.S3Repository;
 import ufrn.middleware.annotations.GetMapping;
 import ufrn.middleware.annotations.PostMapping;
 import ufrn.middleware.annotations.RequestBody;
+import ufrn.middleware.utils.ResponseEntity;
 
 public class S3Controller {
 
@@ -21,20 +22,16 @@ public class S3Controller {
     }
 
     @PostMapping("/s3")
-    public void createBucket(@RequestBody CreateBucketReq bucketName) {
+    public ResponseEntity<?> createBucket(@RequestBody CreateBucketReq bucketName) {
         logger.info("Solicitação para criação de bucket...");
         repository.addBucket(bucketName.bucketName());
         logger.info("Bucket {} Criado com sucesso!", bucketName);
-
+        return new ResponseEntity<>(200, "Bucket " + bucketName + "Criado com sucesso!", null);
     }
 
     @GetMapping("/s3")
-    public void getAllBuckets() {
-        logger.info("Buckets registrados:");
-        logger.info(repository.getAllBuckets());
-
-
+    public ResponseEntity<String> getAllBuckets() {
+        return new ResponseEntity<>(200, "OK", repository.getAllBuckets());
     }
-
 
 }

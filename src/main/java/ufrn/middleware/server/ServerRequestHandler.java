@@ -38,12 +38,7 @@ public class ServerRequestHandler {
         int port = Integer.parseInt(MiddlewareProperties.PORT.getValue());
 
         try (ServerSocket serverSocket = new ServerSocket(port)) {
-            logger.info("Servidor HTTP está rodando na porta {}", port);
-            long endTime = System.currentTimeMillis();
-            long duration = endTime - startTime;
-
-            logger.info("Servidor disponivel em {} milissegundos ", duration);
-
+            printServerInfo(startTime, port);
             var i = 0;
             while (true) {
                 Socket clientSocket = serverSocket.accept();
@@ -54,6 +49,13 @@ public class ServerRequestHandler {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private static void printServerInfo(long startTime, int port) {
+        logger.info("Servidor HTTP está rodando na porta {}", port);
+        long endTime = System.currentTimeMillis();
+        long duration = endTime - startTime;
+        logger.info("Servidor disponivel em {} milissegundos ", duration);
     }
 
     private static void handleRequest(Socket clientSocket, LifecyclePattern lifecyclePattern) {

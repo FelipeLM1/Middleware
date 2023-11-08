@@ -8,6 +8,7 @@ import ufrn.middleware.methods.perRequestLifecycle.InvokerPerRequest;
 import ufrn.middleware.methods.perRequestLifecycle.ObjectIdPerRequest;
 import ufrn.middleware.methods.staticLifecycle.Invoker;
 import ufrn.middleware.start.ScannerPerRequest;
+import ufrn.middleware.utils.ResponseEntity;
 import ufrn.middleware.utils.enums.HttpMethod;
 
 import java.io.BufferedReader;
@@ -15,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.Objects;
 import java.util.Optional;
 
 public class HandleHttpRequest {
@@ -66,18 +68,19 @@ public class HandleHttpRequest {
         String response = "HTTP/1.1 200 OK\r\n\r\n";
         response += "Hello, World!";
         var params = new RequestParam(HttpMethod.GET, path, null);
+        ResponseEntity<?> res = null;
 
         if (optionalObjectIdPerRequest.isPresent()) {
             var invoker = new InvokerPerRequest(optionalObjectIdPerRequest.get());
             logger.info("Novo Invoker!");
-            invoker.invoke(params);
+            res = invoker.invoke(params);
 
         } else {
             logger.info("Invoker Estático!");
-            Invoker.invoke(params);
+            res = Invoker.invoke(params);
         }
-        out.print(response);
-        out.flush();
+        if (Objects.nonNull(res)) HttpResponse.sendJsonResponse(out,res.toJson(),res.status());
+
     }
 
     private static void handlePostRequest(
