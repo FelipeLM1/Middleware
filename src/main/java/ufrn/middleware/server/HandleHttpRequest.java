@@ -145,12 +145,10 @@ public class HandleHttpRequest {
     private static void readHeader(BufferedReader in) throws IOException {
         String line;
         while ((line = in.readLine()) != null && !line.isBlank()) {
-            if (line.startsWith("Content-Length: ")) {
-                ReadHttpHeader.putValue(Headers.CONTENT_LENGTH.getDescription(), line.substring("Content-Length: ".length()));
-            }
-            if (line.startsWith("Content-Type: ")) {
-                ReadHttpHeader.putValue(Headers.CONTENT_TYPE.getDescription(), line.substring("Content-Type:".length()));
-            }
+            var strings = line.split(": ");
+            String key = strings[0];
+            String value = strings[1];
+            ReadHttpHeader.putValue(key, value);
         }
     }
 
