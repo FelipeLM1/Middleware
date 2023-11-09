@@ -9,6 +9,7 @@ import ufrn.middleware.methods.perRequestLifecycle.ObjectIdPerRequest;
 import ufrn.middleware.methods.staticLifecycle.Invoker;
 import ufrn.middleware.start.ScannerPerRequest;
 import ufrn.middleware.utils.ResponseEntity;
+import ufrn.middleware.utils.enums.Headers;
 import ufrn.middleware.utils.enums.HttpMethod;
 
 import java.io.BufferedReader;
@@ -65,8 +66,7 @@ public class HandleHttpRequest {
             PrintWriter out,
             String path,
             Optional<ObjectIdPerRequest> optionalObjectIdPerRequest) {
-        String response = "HTTP/1.1 200 OK\r\n\r\n";
-        response += "Hello, World!";
+
         var params = new RequestParam(HttpMethod.GET, path, null);
         ResponseEntity<?> res = null;
 
@@ -79,7 +79,7 @@ public class HandleHttpRequest {
             logger.info("Invoker Estático!");
             res = Invoker.invoke(params);
         }
-        if (Objects.nonNull(res)) HttpResponse.sendJsonResponse(out,res.toJson(),res.status());
+        if (Objects.nonNull(res)) HttpResponse.sendJsonResponse(out, res.toJson(), res.status());
 
     }
 
@@ -89,7 +89,14 @@ public class HandleHttpRequest {
             String path, Optional<ObjectIdPerRequest> optionalObjectIdPerRequest)
             throws IOException {
 
-        String contentLengthHeader = readContentLengthHeader(in);
+        readHeader(in);
+        String contentLengthHeader = ReadHttpHeader.getValue("Content-Length");
+        String contentType = ReadHttpHeader.getValue("Content-Type");
+
+        System.out.println("CONTENTLENGHT");
+        System.out.println(contentLengthHeader);
+        System.out.println("CONTENTTYPE");
+        System.out.println(contentType);
         int contentLength;
 
         while (true) {
@@ -122,6 +129,9 @@ public class HandleHttpRequest {
 
                     sendPostResponse(out);
                 } else {
+                    System.out.println("CONTENT-HEADER");
+                    System.out.println(contentLengthHeader);
+
                     handleContentLengthMismatch(out);
                 }
             } else {
@@ -132,14 +142,16 @@ public class HandleHttpRequest {
         }
     }
 
-    private static String readContentLengthHeader(BufferedReader in) throws IOException {
+    private static void readHeader(BufferedReader in) throws IOException {
         String line;
-        while ((line = in.readLine()) != null && !line.isEmpty()) {
+        while ((line = in.readLine()) != null && !line.isBlank()) {
             if (line.startsWith("Content-Length: ")) {
-                return line.substring("Content-Length: ".length());
+                ReadHttpHeader.putValue(Headers.CONTENT_LENGTH.getDescription(), line.substring("Content-Length: ".length()));
+            }
+            if (line.startsWith("Content-Type: ")) {
+                ReadHttpHeader.putValue(Headers.CONTENT_TYPE.getDescription(), line.substring("Content-Type:".length()));
             }
         }
-        return null;
     }
 
     private static void sendPostResponse(PrintWriter out) {

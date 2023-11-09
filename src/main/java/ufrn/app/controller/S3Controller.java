@@ -2,6 +2,7 @@ package ufrn.app.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ufrn.app.model.FileBucket;
 import ufrn.app.repository.S3Repository;
 import ufrn.middleware.annotations.GetMapping;
 import ufrn.middleware.annotations.PostMapping;
@@ -21,10 +22,21 @@ public class S3Controller {
     record CreateBucketReq(String bucketName) {
     }
 
+    record uploadF(FileBucket file) {
+    }
+
     @PostMapping("/s3")
     public ResponseEntity<?> createBucket(@RequestBody CreateBucketReq bucketName) {
         logger.info("Solicitação para criação de bucket...");
         repository.addBucket(bucketName.bucketName());
+        logger.info("Bucket {} Criado com sucesso!", bucketName);
+        return new ResponseEntity<>(200, "Bucket " + bucketName + "Criado com sucesso!", null);
+    }
+
+    @PostMapping("/s3/upload")
+    public ResponseEntity<?> uploadFile(@RequestBody FileBucket bucketName) {
+        logger.info("Solicitação para criação de bucket...");
+        //repository.addBucket(bucketName.bucketName());
         logger.info("Bucket {} Criado com sucesso!", bucketName);
         return new ResponseEntity<>(200, "Bucket " + bucketName + "Criado com sucesso!", null);
     }
