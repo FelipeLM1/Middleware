@@ -1,4 +1,4 @@
-package ufrn.middleware.server;
+package ufrn.middleware.server.http;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -7,8 +7,10 @@ import ufrn.middleware.configuration.MiddlewareProperties;
 import ufrn.middleware.methods.perRequestLifecycle.InvokerPerRequest;
 import ufrn.middleware.methods.perRequestLifecycle.ObjectIdPerRequest;
 import ufrn.middleware.methods.staticLifecycle.Invoker;
+import ufrn.middleware.server.RequestParam;
 import ufrn.middleware.start.ScannerPerRequest;
 import ufrn.middleware.utils.ResponseEntity;
+import ufrn.middleware.utils.enums.ContentType;
 import ufrn.middleware.utils.enums.Headers;
 import ufrn.middleware.utils.enums.HttpMethod;
 
@@ -36,7 +38,7 @@ public class HandleHttpRequest {
             logger.info(requestLine);
 
             if (requestLine != null) {
-                String[] requestParts = requestLine.split(" ");
+                String[] requestParts = requestLine.split("\\s|;");
                 String method = requestParts[0];
                 String path = requestParts[1];
 
@@ -47,20 +49,17 @@ public class HandleHttpRequest {
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Erro de IO: \n {}", e.getMessage());
         }
     }
 
     private static void callRemoteMethod(Optional<ObjectIdPerRequest> objectIdPerRequest, String method, PrintWriter out, String path, BufferedReader in) throws IOException {
-        if ("GET".equals(method)) {
-            handleGetRequest(out, path, objectIdPerRequest);
-        } else if ("POST".equals(method)) {
-            handlePostRequest(in, out, path, objectIdPerRequest);
-        } else {
-            handleNotFound(out);
+        switch (method) {
+            case "GET" -> handleGetRequest(out, path, objectIdPerRequest);
+            case "POST" -> handlePostRequest(in, out, path, objectIdPerRequest);
+            default -> handleNotFound(out);
         }
     }
-
 
     private static void handleGetRequest(
             PrintWriter out,
@@ -68,7 +67,7 @@ public class HandleHttpRequest {
             Optional<ObjectIdPerRequest> optionalObjectIdPerRequest) {
 
         var params = new RequestParam(HttpMethod.GET, path, null);
-        ResponseEntity<?> res = null;
+        ResponseEntity<?> res;
 
         if (optionalObjectIdPerRequest.isPresent()) {
             var invoker = new InvokerPerRequest(optionalObjectIdPerRequest.get());
@@ -89,33 +88,40 @@ public class HandleHttpRequest {
             String path, Optional<ObjectIdPerRequest> optionalObjectIdPerRequest)
             throws IOException {
 
-        readHeader(in);
-        String contentLengthHeader = ReadHttpHeader.getValue("Content-Length");
-        String contentType = ReadHttpHeader.getValue("Content-Type");
+        var headerReader = new ReadHttpHeader();
+        headerReader.readHeader(in);
 
-        System.out.println("CONTENTLENGHT");
-        System.out.println(contentLengthHeader);
-        System.out.println("CONTENTTYPE");
-        System.out.println(contentType);
-        int contentLength;
+        var contentType = headerReader.getValue(Headers.CONTENT_TYPE.getDescription());
+        var contentLengthHeader = Integer.valueOf(headerReader.getValue(Headers.CONTENT_LENGTH.getDescription()));
 
-        while (true) {
-            var line = in.readLine();
-            if (line == null || line.isEmpty()) {
-                break;
-            }
+        if (contentType.startsWith(ContentType.JSON.getDescription())) {
+            handleJsonPost(in, out, path, contentLengthHeader, optionalObjectIdPerRequest);
+        } else if (contentType.startsWith(ContentType.MULTIPART_FORM_DATA.getDescription())) {
+            handleFormDataPost(in, out);
+        } else {
+            out.println("HTTP/1.1 415 Unsupported Media Type");
+            out.println();
         }
+    }
 
+    private static void handleFormDataPost(BufferedReader reader, PrintWriter writer) throws IOException {
+        var formData = reader.readLine();
+        writer.println("HTTP/1.1 200 OK");
+        writer.println("Content-Type: text/plain");
+        writer.println();
+        writer.println("Received Form Data: " + formData);
+    }
 
-        if (contentLengthHeader != null) {
-            contentLength = Integer.parseInt(contentLengthHeader);
+    private static void handleJsonPost(BufferedReader in, PrintWriter out, String path, Integer contentLength,
+                                       Optional<ObjectIdPerRequest> optionalObjectIdPerRequest) throws IOException {
 
+        if (contentLength != null) {
             if (contentLength > 0) {
                 char[] buffer = new char[contentLength];
                 int bytesRead = in.read(buffer);
 
                 if (bytesRead == contentLength) {
-                    String requestBody = new String(buffer);
+                    var requestBody = new String(buffer);
                     var params = new RequestParam(HttpMethod.POST, path, requestBody);
                     if (optionalObjectIdPerRequest.isPresent()) {
                         var invoker = new InvokerPerRequest(optionalObjectIdPerRequest.get());
@@ -129,9 +135,6 @@ public class HandleHttpRequest {
 
                     sendPostResponse(out);
                 } else {
-                    System.out.println("CONTENT-HEADER");
-                    System.out.println(contentLengthHeader);
-
                     handleContentLengthMismatch(out);
                 }
             } else {
@@ -142,18 +145,8 @@ public class HandleHttpRequest {
         }
     }
 
-    private static void readHeader(BufferedReader in) throws IOException {
-        String line;
-        while ((line = in.readLine()) != null && !line.isBlank()) {
-            var strings = line.split(": ");
-            String key = strings[0];
-            String value = strings[1];
-            ReadHttpHeader.putValue(key, value);
-        }
-    }
-
     private static void sendPostResponse(PrintWriter out) {
-        String response = "HTTP/1.1 200 OK\r\n\r\n";
+        var response = "HTTP/1.1 200 OK\r\n\r\n";
         response += "Solicitação POST processada com sucesso.";
         out.print(response);
         out.flush();
@@ -175,14 +168,14 @@ public class HandleHttpRequest {
     }
 
     private static void handleNotFound(PrintWriter out) {
-        String response = "HTTP/1.1 404 Not Found\r\n\r\n";
+        var response = "HTTP/1.1 404 Not Found\r\n\r\n";
         response += "Página não encontrada";
         out.print(response);
         out.flush();
     }
 
     private static void handleServerError(PrintWriter out) {
-        String response = "HTTP/1.1 500 Internal Server Error\r\n\r\n";
+        var response = "HTTP/1.1 500 Internal Server Error\r\n\r\n";
         response += "Ocorreu um erro interno no servidor.";
         out.print(response);
         out.flush();

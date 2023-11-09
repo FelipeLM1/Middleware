@@ -6,6 +6,7 @@ import ufrn.middleware.configuration.AcquisitionType;
 import ufrn.middleware.configuration.LifecyclePattern;
 import ufrn.middleware.configuration.MiddlewareProperties;
 import ufrn.middleware.methods.perRequestLifecycle.ObjectIdPerRequest;
+import ufrn.middleware.server.http.HandleHttpRequest;
 import ufrn.middleware.start.ScannerPerRequest;
 
 import java.io.IOException;
@@ -69,6 +70,8 @@ public class ServerRequestHandler {
                 new ScannerPerRequest(objectIdPerRequest.get());
             }
         }
+        //var reqHandler = new RequestHandler(clientSocket, objectIdPerRequest);
+        //reqHandler.handleRequest();
         HandleHttpRequest.handleRequest(clientSocket, objectIdPerRequest);
     }
 }

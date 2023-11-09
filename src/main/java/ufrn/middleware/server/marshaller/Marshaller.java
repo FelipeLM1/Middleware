@@ -1,4 +1,4 @@
-package ufrn.middleware.server;
+package ufrn.middleware.server.marshaller;
 
 import com.google.gson.JsonObject;
 import ufrn.middleware.exceptions.RemoteError;
@@ -30,7 +30,7 @@ public interface Marshaller {
      * @return An instance of the specified class containing the deserialized data.
      * @throws RemoteError If there's an error during deserialization.
      */
-    public Object deserialize(String body, Class<?> clazz) throws RemoteError;
+    Object deserialize(String body, Class<?> clazz) throws RemoteError;
 }
 
 

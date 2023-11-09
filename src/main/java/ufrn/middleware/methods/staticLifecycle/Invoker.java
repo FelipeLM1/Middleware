@@ -1,7 +1,7 @@
 package ufrn.middleware.methods.staticLifecycle;
 
 import ufrn.middleware.annotations.RequestBody;
-import ufrn.middleware.server.MarshallerImpl;
+import ufrn.middleware.server.marshaller.MarshallerImpl;
 import ufrn.middleware.server.RequestParam;
 import ufrn.middleware.utils.ResponseEntity;
 import ufrn.middleware.utils.enums.HttpMethod;

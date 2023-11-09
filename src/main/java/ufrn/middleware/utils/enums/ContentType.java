@@ -9,4 +9,8 @@ public enum ContentType {
     ContentType(String description) {
         this.description = description;
     }
+
+    public String getDescription() {
+        return description;
+    }
 }

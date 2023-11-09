@@ -1,4 +1,4 @@
-package ufrn.middleware.server;
+package ufrn.middleware.server.marshaller;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;

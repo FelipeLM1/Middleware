@@ -1,4 +1,4 @@
-package ufrn.middleware.server;
+package ufrn.middleware.server.http;
 
 import java.io.PrintWriter;
 

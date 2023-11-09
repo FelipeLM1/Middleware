@@ -3,7 +3,7 @@ package ufrn.middleware.methods.perRequestLifecycle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ufrn.middleware.annotations.RequestBody;
-import ufrn.middleware.server.MarshallerImpl;
+import ufrn.middleware.server.marshaller.MarshallerImpl;
 import ufrn.middleware.server.RequestParam;
 import ufrn.middleware.utils.ResponseEntity;
 import ufrn.middleware.utils.enums.HttpMethod;
