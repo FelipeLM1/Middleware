@@ -11,10 +11,10 @@ Projeto para a disciplina de Sistemas Distribuídos
 - [x] Server Request Handler
 - [x] Client Request Handler (Não integrado)
 - [x] Remoting Error
-- [x] Invoker
+- [x] Invoker (Não integrado)
 - [x] Requestor
-- [x] Marshaller
-- [x] Remote Object
+- [x] Marshaller (Não integrado)
+- [x] Remote Object (Não integrado)
 
 ### Idetification
 - [x] Object ID
