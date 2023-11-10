@@ -33,10 +33,10 @@ Projeto para a disciplina de Sistemas Distribuídos
 - [ ] Protocol Plug-In
 
 ### Aplication S3
-- [ ] POST
-- [ ] GET
+- [X] POST
+- [X] GET
 - [ ] FILE
 
 ### Aplication MQTT
-- [ ] Client
-- [ ] Broker
+- [X] Client
+- [X] Broker
