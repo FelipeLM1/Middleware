@@ -31,3 +31,12 @@ Projeto para a disciplina de Sistemas Distribuídos
 - [ ] Invocation Interceptor
 - [ ] Invocation Context
 - [ ] Protocol Plug-In
+
+### Aplication S3
+- [ ] POST
+- [ ] GET
+- [ ] FILE
+
+### Aplication MQTT
+- [ ] Client
+- [ ] Broker
