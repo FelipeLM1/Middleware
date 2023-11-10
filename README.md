@@ -13,7 +13,7 @@ Projeto para a disciplina de Sistemas Distribuídos
 - [x] Remoting Error
 - [x] Invoker
 - [x] Requestor
-- [x] Marshaller (Não integrado)
+- [x] Marshaller
 - [x] Remote Object
 
 ### Idetification
