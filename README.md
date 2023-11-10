@@ -32,11 +32,14 @@ Projeto para a disciplina de Sistemas Distribuídos
 - [ ] Invocation Context
 - [ ] Protocol Plug-In
 
-### Aplication S3
+## Aplications
+
+### S3 (Falta desacoplar do middleware)
 - [X] POST
 - [X] GET
-- [ ] FILE
+- [ ] UPLOAD FILE
+- [ ] DOWNLOAD FILE
 
-### Aplication MQTT
+### MQTT (Não intergrado com o Middleware)
 - [X] Client
 - [X] Broker
