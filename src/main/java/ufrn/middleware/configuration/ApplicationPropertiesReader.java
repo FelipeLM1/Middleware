@@ -36,6 +36,16 @@ public class ApplicationPropertiesReader {
         }
     }
 
+    public static void setPathFileConfiguration(String pathFile){
+        if (!pathFile.isEmpty()){
+            try (InputStream input = new FileInputStream(pathFile)) {
+                properties.load(input);
+            } catch (IOException e) {
+                logger.error(e.getMessage());
+            }
+        }
+    }
+
     public static String getProperty(String key) {
         return properties.getProperty(key);
     }

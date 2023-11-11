@@ -2,8 +2,13 @@ package ufrn.middleware.start;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ufrn.middleware.configuration.ApplicationPropertiesReader;
 import ufrn.middleware.configuration.LifecyclePattern;
+import ufrn.middleware.configuration.MiddlewareProperties;
+import ufrn.middleware.server.ClientRequestHandler;
 import ufrn.middleware.server.ServerRequestHandler;
+
+import java.util.Objects;
 
 /**
  * Main entry point for the Middleware application.
@@ -25,13 +30,31 @@ public class MiddlewareApplication {
     public static void run() {
         MiddlewareBanner.printBanner();
         logger.info("Iniciando Middleware...");
-        startApplication();
+        if(Objects.equals(MiddlewareProperties.TYPE.getValue(), "SERVER"))
+            startApplication();
+        else
+            connectApplication();
+    }
+
+    public static void run(String PathFileConfiguration) {
+        MiddlewareBanner.printBanner();
+        logger.info("Iniciando Middleware...");
+        ApplicationPropertiesReader.setPathFileConfiguration(PathFileConfiguration);
+        if(Objects.equals(MiddlewareProperties.TYPE.getValue(), "SERVER"))
+            startApplication();
+        else
+            connectApplication();
     }
 
     private static void startApplication() {
         var startTime = System.currentTimeMillis();
         if (LifecyclePattern.isStaticInstances()) MiddlewareRegisterServices.start();
         ServerRequestHandler.start(startTime);
+    }
+
+    private static void connectApplication() {
+        //if (LifecyclePattern.isStaticInstances()) MiddlewareRegisterServices.start();
+        ClientRequestHandler.start();
     }
 
 }
