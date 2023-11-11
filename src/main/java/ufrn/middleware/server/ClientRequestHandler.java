@@ -6,11 +6,10 @@ import ufrn.middleware.configuration.AcquisitionType;
 import ufrn.middleware.configuration.LifecyclePattern;
 import ufrn.middleware.configuration.MiddlewareProperties;
 import ufrn.middleware.methods.perRequestLifecycle.ObjectIdPerRequest;
-import ufrn.middleware.server.http.HandleHttpRequest;
+import ufrn.middleware.server.mqtt.HandleMqttRequest;
 import ufrn.middleware.start.ScannerPerRequest;
 
 import java.io.IOException;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Optional;
 
@@ -39,20 +38,11 @@ public class ClientRequestHandler {
 
         logger.info("Conectando ao servidor " + ip + ":" + port + "...");
 
-        /*
-        try (ServerSocket serverSocket = new ServerSocket(port)) {
-            printClientInfo( port);
-            var i = 0;
-            while (true) {
-                Socket clientSocket = serverSocket.accept();
-                Thread.ofVirtual().name("VThread: " + i)
-                        .start(() -> handleRequest(clientSocket, LifecyclePattern.getLifecyclePattern()));
-                i++;
-            }
+        try  (Socket socket = new Socket(ip, port)) {
+            Thread.ofVirtual().name("VThread: 1").start(() -> handleRequest(socket, LifecyclePattern.getLifecyclePattern()));
         } catch (IOException e) {
             e.printStackTrace();
         }
-        */
 
     }
 
@@ -73,7 +63,7 @@ public class ClientRequestHandler {
         }
         //var reqHandler = new RequestHandler(clientSocket, objectIdPerRequest);
         //reqHandler.handleRequest();
-        HandleHttpRequest.handleRequest(clientSocket, objectIdPerRequest);
+        HandleMqttRequest.handleRequest(clientSocket, objectIdPerRequest);
     }
 
 }
