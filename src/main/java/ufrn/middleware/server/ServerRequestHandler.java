@@ -70,8 +70,7 @@ public class ServerRequestHandler {
                 new ScannerPerRequest(objectIdPerRequest.get());
             }
         }
-        //var reqHandler = new RequestHandler(clientSocket, objectIdPerRequest);
-        //reqHandler.handleRequest();
+
         HandleHttpRequest.handleRequest(clientSocket, objectIdPerRequest);
     }
 }

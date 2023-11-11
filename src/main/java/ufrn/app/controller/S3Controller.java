@@ -45,5 +45,4 @@ public class S3Controller {
     public ResponseEntity<String> getAllBuckets() {
         return new ResponseEntity<>(200, "OK", repository.getAllBuckets());
     }
-
 }

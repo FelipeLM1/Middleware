@@ -8,6 +8,7 @@ import ufrn.middleware.methods.perRequestLifecycle.InvokerPerRequest;
 import ufrn.middleware.methods.perRequestLifecycle.ObjectIdPerRequest;
 import ufrn.middleware.methods.staticLifecycle.Invoker;
 import ufrn.middleware.server.RequestParam;
+import ufrn.middleware.server.http.util.FormDataParser;
 import ufrn.middleware.start.ScannerPerRequest;
 import ufrn.middleware.utils.ResponseEntity;
 import ufrn.middleware.utils.enums.ContentType;
@@ -105,11 +106,11 @@ public class HandleHttpRequest {
     }
 
     private static void handleFormDataPost(BufferedReader reader, PrintWriter writer) throws IOException {
-        var formData = reader.readLine();
+        var res = FormDataParser.parseFormData(reader);
+
         writer.println("HTTP/1.1 200 OK");
         writer.println("Content-Type: text/plain");
         writer.println();
-        writer.println("Received Form Data: " + formData);
     }
 
     private static void handleJsonPost(BufferedReader in, PrintWriter out, String path, Integer contentLength,
@@ -127,7 +128,6 @@ public class HandleHttpRequest {
                         var invoker = new InvokerPerRequest(optionalObjectIdPerRequest.get());
                         logger.info("Novo Invoker!");
                         invoker.invoke(params);
-
                     } else {
                         logger.info("Invoker Estático!");
                         Invoker.invoke(params);
