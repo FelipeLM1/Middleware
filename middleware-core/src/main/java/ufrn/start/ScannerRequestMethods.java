@@ -2,9 +2,9 @@ package ufrn.start;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ufrn.annotations.GetMapping;
-import ufrn.annotations.PostMapping;
-import ufrn.annotations.RequestHttpMapping;
+import ufrn.annotations.http.GetMapping;
+import ufrn.annotations.http.PostMapping;
+import ufrn.annotations.http.RequestHttpMapping;
 import ufrn.methods.staticLifecycle.ObjectIdStatic;
 import ufrn.utils.enums.HttpMethod;
 

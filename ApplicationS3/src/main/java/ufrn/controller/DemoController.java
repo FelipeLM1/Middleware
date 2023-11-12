@@ -2,9 +2,9 @@ package ufrn.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ufrn.annotations.GetMapping;
-import ufrn.annotations.PostMapping;
-import ufrn.annotations.RequestBody;
+import ufrn.annotations.http.GetMapping;
+import ufrn.annotations.http.PostMapping;
+import ufrn.annotations.http.RequestBody;
 
 public class DemoController {
 

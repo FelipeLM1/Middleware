@@ -1,6 +1,6 @@
 package ufrn.methods.staticLifecycle;
 
-import ufrn.annotations.RequestBody;
+import ufrn.annotations.http.RequestBody;
 import ufrn.server.marshaller.MarshallerImpl;
 import ufrn.server.RequestParam;
 import ufrn.utils.ResponseEntity;

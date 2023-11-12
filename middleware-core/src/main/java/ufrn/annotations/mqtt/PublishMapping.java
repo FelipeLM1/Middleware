@@ -1,4 +1,7 @@
-package ufrn.annotations;
+package ufrn.annotations.mqtt;
+
+import ufrn.annotations.http.PostMapping;
+import ufrn.annotations.http.RequestHttpMapping;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

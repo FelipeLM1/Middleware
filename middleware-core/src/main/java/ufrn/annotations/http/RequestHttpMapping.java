@@ -1,4 +1,4 @@
-package ufrn.annotations;
+package ufrn.annotations.http;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

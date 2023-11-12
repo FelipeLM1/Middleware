@@ -2,7 +2,7 @@ package ufrn.methods.perRequestLifecycle;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ufrn.annotations.RequestBody;
+import ufrn.annotations.http.RequestBody;
 import ufrn.server.marshaller.MarshallerImpl;
 import ufrn.server.RequestParam;
 import ufrn.utils.ResponseEntity;

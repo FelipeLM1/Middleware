@@ -1,4 +1,7 @@
-package ufrn.annotations;
+package ufrn.annotations.mqtt;
+
+import ufrn.annotations.http.PostMapping;
+import ufrn.annotations.http.RequestHttpMapping;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -19,9 +22,9 @@ import java.lang.annotation.Target;
  * @see RequestHttpMapping
  * @see PostMapping
  */
-@RequestHttpMapping
+@RequestMqttMapping
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface GetMapping {
+public @interface SubscribeMapping {
     String value() default "/";
 }
