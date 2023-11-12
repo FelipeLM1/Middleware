@@ -33,9 +33,11 @@ public class FormDataParser {
 //                return formData;
 //              Read the part content
                 StringBuilder content = new StringBuilder();
-                while ((line = reader.readLine()) != null && !line.contains(boundary)) {
+                line = reader.readLine();
+                while (line != null && !line.contains(boundary)) {
                     content.append(line);
                     content.append("\r\n");
+                    line = reader.readLine();
                 }
                 // Extract the part name and value
                 String partContent = content.toString().trim();
