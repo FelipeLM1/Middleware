@@ -8,7 +8,8 @@ public enum MiddlewareProperties {
     PROTOCOL("middleware.protocol"),
     SCAN("middleware.scan.package"),
     LIFECYCLE_PATTERN("middleware.lifecycle.pattern"),
-    ACQUISITION_TYPE("middleware.lifecycle.acquisition-type");
+    ACQUISITION_TYPE("middleware.lifecycle.acquisition-type"),
+    LOOKUP_CLIENT_SERVICE_URL("lookup.client.serviceUrl");
 
     private final String propertyKey;
 
