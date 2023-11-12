@@ -95,9 +95,9 @@ public class HandleHttpRequest {
         var contentType = headerReader.getValue(Headers.CONTENT_TYPE.getDescription());
         var contentLengthHeader = Integer.valueOf(headerReader.getValue(Headers.CONTENT_LENGTH.getDescription()));
 
-        if (contentType.startsWith(ContentType.JSON.getDescription())) {
+        if (contentType.equals(ContentType.JSON.getDescription())) {
             handleJsonPost(in, out, path, contentLengthHeader, optionalObjectIdPerRequest);
-        } else if (contentType.startsWith(ContentType.MULTIPART_FORM_DATA.getDescription())) {
+        } else if (contentType.equals(ContentType.MULTIPART_FORM_DATA.getDescription())) {
             handleFormDataPost(in, out);
         } else {
             out.println("HTTP/1.1 415 Unsupported Media Type");

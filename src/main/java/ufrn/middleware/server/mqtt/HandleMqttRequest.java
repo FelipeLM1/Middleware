@@ -100,9 +100,9 @@ public class HandleMqttRequest {
         var contentLengthHeader = Integer.valueOf(headerReader.getValue(Headers.CONTENT_LENGTH.getDescription()));
 
         if (contentType.startsWith(ContentType.JSON.getDescription())) {
-            handleJsonPost(in, out, path, contentLengthHeader, optionalObjectIdPerRequest);
+//            handleJsonPost(in, out, path, contentLengthHeader, optionalObjectIdPerRequest);
         } else if (contentType.startsWith(ContentType.MULTIPART_FORM_DATA.getDescription())) {
-            handleFormDataPost(in, out);
+//            handleFormDataPost(in, out);
         } else {
             out.println("HTTP/1.1 415 Unsupported Media Type");
             out.println();
