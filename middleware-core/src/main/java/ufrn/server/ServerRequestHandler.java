@@ -8,6 +8,7 @@ import ufrn.configuration.MiddlewareProperties;
 import ufrn.methods.perRequestLifecycle.ObjectIdPerRequest;
 import ufrn.server.http.HandleHttpRequest;
 import ufrn.start.ScannerPerRequest;
+import ufrn.start.lookup.RegisterService;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -37,6 +38,7 @@ public class ServerRequestHandler {
     public static void start(long startTime) {
         logger.info("Iniciando o server...");
         int port = Integer.parseInt(MiddlewareProperties.PORT.getValue());
+        RegisterService.start();
 
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             printServerInfo(startTime, port);

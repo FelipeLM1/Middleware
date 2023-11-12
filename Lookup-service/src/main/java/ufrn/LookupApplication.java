@@ -1,7 +1,7 @@
 package ufrn;
 
-public class Main {
+public class LookupApplication {
     public static void main(String[] args) {
-        System.out.println("Hello world!");
+        Server.start();
     }
 }

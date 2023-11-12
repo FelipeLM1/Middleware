@@ -9,7 +9,9 @@ public enum MiddlewareProperties {
     SCAN("middleware.scan.package"),
     LIFECYCLE_PATTERN("middleware.lifecycle.pattern"),
     ACQUISITION_TYPE("middleware.lifecycle.acquisition-type"),
-    LOOKUP_CLIENT_SERVICE_URL("lookup.client.serviceUrl");
+    LOOKUP_CLIENT_SERVICE_URL("lookup.client.serviceUrl"),
+    APPLICATION_NAME("middleware.application.name"),
+    APPLICATION_MAIN_CLASS("middleware.application.main");
 
     private final String propertyKey;
 

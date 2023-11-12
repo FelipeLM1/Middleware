@@ -29,7 +29,7 @@ public class ApplicationPropertiesReader {
 
     static {
         logger = LoggerFactory.getLogger(ApplicationPropertiesReader.class);
-        try (InputStream input = new FileInputStream("middleware-core/src/main/resources/application.properties")) {
+        try (InputStream input = new FileInputStream("ApplicationS3/src/main/resources/application.properties")) {
             properties.load(input);
         } catch (IOException e) {
             logger.error(e.getMessage());
