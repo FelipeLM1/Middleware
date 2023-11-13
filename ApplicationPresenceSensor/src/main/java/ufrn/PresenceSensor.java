@@ -1,13 +1,11 @@
-package ufrn.appPresenceSensor;
+package ufrn;
+
+import ufrn.annotations.mqtt.PublishMapping;
+import ufrn.start.MiddlewareApplication;
 
 import java.io.IOException;
 import java.util.Random;
 
-//import middleware.Requestor;
-//import middleware.ObjectIDs;
-
-import ufrn.middleware.annotations.PublishMapping;
-import ufrn.middleware.start.MiddlewareApplication;
 
 /**
  * Representa o sensor de presença de um ambiente.
@@ -21,7 +19,7 @@ public class PresenceSensor {
     /** Controla as requisições feitas ao servidor (<i>broker</i>). */
     //private static Requestor requestor = null;
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
 
         MiddlewareApplication.run("src/main/resources/applicationMQTT.properties");
 
