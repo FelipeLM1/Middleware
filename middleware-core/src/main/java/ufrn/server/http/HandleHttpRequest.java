@@ -15,10 +15,7 @@ import ufrn.utils.enums.ContentType;
 import ufrn.utils.enums.Headers;
 import ufrn.utils.enums.HttpMethod;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 import java.util.Objects;
 import java.util.Optional;
@@ -107,7 +104,8 @@ public class HandleHttpRequest {
 
     private static void handleFormDataPost(BufferedReader reader, PrintWriter writer) throws IOException {
         var res = FormDataParser.parseFormData(reader);
-
+        File file = (File) res.get("file");
+        System.out.println(file.getName());
         writer.println("HTTP/1.1 200 OK");
         writer.println("Content-Type: text/plain");
         writer.println();

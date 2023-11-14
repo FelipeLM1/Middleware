@@ -1,26 +1,24 @@
 package ufrn.server.http.util;
 
-import java.io.BufferedReader;
-import java.io.IOException;
+import ufrn.exceptions.BadRequestException;
+
+import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 public class FormDataParser {
 
-    public static Map<String, String> parseFormData(BufferedReader reader) throws IOException {
-        Map<String, String> formData = new HashMap<>();
-        // Read the content type line
+    public static Map<String, Object> parseFormData(BufferedReader reader) throws IOException {
+        Map<String, Object> formData = new HashMap<>();
+
         String contentTypeLine = reader.readLine();
 
-        // Read the boundary from the content type line
         String boundary = "--------" + contentTypeLine.substring(contentTypeLine.indexOf("boundary=") + 9);
 
-        // Process each part in the multipart content
         String line = boundary;
         while (line != null) {
             if (line.equals(boundary)) {
-                // Read headers for the part
-//                line = reader.readLine();
                 Map<String, String> headers = new HashMap<>();
                 while (line != null && !line.trim().isEmpty()) {
                     String[] headerParts = line.split(": ");
@@ -28,10 +26,8 @@ public class FormDataParser {
                         headers.put(headerParts[0].trim(), headerParts[1].trim());
                     }
                     line = reader.readLine();
-                    System.out.println("i>> " + line);
                 }
-//                return formData;
-//              Read the part content
+                // Lê o conteudo
                 StringBuilder content = new StringBuilder();
                 line = reader.readLine();
                 while (line != null && !line.contains(boundary)) {
@@ -42,14 +38,31 @@ public class FormDataParser {
                 // Extract the part name and value
                 String partContent = content.toString().trim();
                 String partName = headers.get("Content-Disposition").split(";")[1].trim().split("=")[1].replaceAll("\"", "");
-                formData.put(partName, partContent);
-//                return formData;
+//                formData.put(partName, partContent);
+                // Check if the part is a file or a regular form field
+                if (headers.containsKey("Content-Type")) {
+                    // It's a file
+                    String fileName = headers.get("Content-Disposition").split(";")[2].trim().split("=")[1].replaceAll("\"", "");
+                    File file = saveToFile(partContent, fileName);
+                    formData.put(partName, file);
+                } else {
+                    formData.put(partName, partContent);
+                }
             } else {
-                System.out.println("e>> " + line);
                 break;
             }
         }
 
         return formData;
+    }
+
+    private static File saveToFile(String content, String fileName) {
+        File file = new File(fileName);
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+            writer.write(content);
+        } catch (IOException exception) {
+           throw new BadRequestException("Erro ao ler arquivo" + fileName, 400);
+        }
+        return file;
     }
 }
