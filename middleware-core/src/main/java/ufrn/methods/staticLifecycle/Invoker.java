@@ -1,16 +1,16 @@
 package ufrn.methods.staticLifecycle;
 
 import ufrn.annotations.http.RequestBody;
-import ufrn.server.marshaller.MarshallerImpl;
 import ufrn.server.RequestParam;
+import ufrn.server.marshaller.MarshallerJson;
 import ufrn.utils.ResponseEntity;
 import ufrn.utils.enums.HttpMethod;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -52,19 +52,18 @@ public class Invoker {
         try {
             var methodOpt = ObjectIdStatic.getMethod(httpMethod, path);
             Class<?> clazz;
-            Object args;
+            Object[] args;
             if ((methodOpt.isPresent())) {
                 var method = methodOpt.get();
                 clazz = method.getDeclaringClass();
                 var obj = clazz.getDeclaredConstructor().newInstance();
 
                 if (httpMethod.equals(HttpMethod.POST) && Objects.nonNull(jsonString)) {
-                    args = getRequestBodyParam(method, jsonString);
+                    args = getRequestBodyParam(jsonString, method.getParameters());
                     return (ResponseEntity<?>) method.invoke(obj, args);
                 } else if (Objects.isNull(jsonString)) {
                     return (ResponseEntity<?>) method.invoke(obj);
                 }
-
             }
 
         } catch (InvocationTargetException | IllegalAccessException e) {
@@ -76,23 +75,9 @@ public class Invoker {
         return null;
     }
 
-    private static Object getRequestBodyParam(Method method, String jsonString) {
-        Parameter parameter = findAnnotatedParameter(method, RequestBody.class);
-        if (parameter != null) {
-            Class<?> parameterType = parameter.getType();
-            return new MarshallerImpl().deserialize(jsonString, parameterType);
-        }
-        return null;
+    private static Object[] getRequestBodyParam(String jsonString, Parameter[] parameters) {
+        return new MarshallerJson().deserialize(jsonString, parameters);
     }
 
-    private static Parameter findAnnotatedParameter(Method method, Class<? extends Annotation> annotationType) {
-        return Arrays.stream(method.getParameters())
-                .filter(parameter -> parameter.isAnnotationPresent(annotationType))
-                .findFirst()
-                .orElse(null);
-    }
-    //invoke before
-    //chamar objeto remoto
-    //invoke after -> interceptador
 
 }

@@ -3,8 +3,8 @@ package ufrn.methods.perRequestLifecycle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ufrn.annotations.http.RequestBody;
-import ufrn.server.marshaller.MarshallerImpl;
 import ufrn.server.RequestParam;
+import ufrn.server.marshaller.MarshallerJson;
 import ufrn.utils.ResponseEntity;
 import ufrn.utils.enums.HttpMethod;
 
@@ -38,14 +38,14 @@ public class InvokerPerRequest {
         try {
             var methodOpt = objectIdPerRequest.getMethod(httpMethod, path);
             Class<?> clazz;
-            Object args;
+            Object[] args;
             if ((methodOpt.isPresent())) {
                 var method = methodOpt.get();
                 clazz = method.getDeclaringClass();
                 var obj = clazz.getDeclaredConstructor().newInstance();
 
                 if (httpMethod.equals(HttpMethod.POST) && Objects.nonNull(jsonString)) {
-                    args = getRequestBodyParam(method, jsonString);
+                    args = getRequestBodyParam(jsonString, method.getParameters());
                     return (ResponseEntity<?>) method.invoke(obj, args);
                 } else if (Objects.isNull(jsonString)) {
                     return (ResponseEntity<?>) method.invoke(obj);
@@ -61,11 +61,15 @@ public class InvokerPerRequest {
         return null;
     }
 
+    private Object[] getRequestBodyParam(String jsonString, Parameter[] parameters) {
+        return new MarshallerJson().deserialize(jsonString, parameters);
+    }
+
     private Object getRequestBodyParam(Method method, String jsonString) {
         Parameter parameter = findAnnotatedParameter(method, RequestBody.class);
         if (parameter != null) {
             Class<?> parameterType = parameter.getType();
-            return new MarshallerImpl().deserialize(jsonString, parameterType);
+            return new MarshallerJson().deserialize(jsonString, parameterType);
         }
         return null;
     }

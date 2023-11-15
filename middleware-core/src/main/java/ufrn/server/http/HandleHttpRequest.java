@@ -29,6 +29,7 @@ public class HandleHttpRequest {
     private static final Logger logger = LoggerFactory.getLogger(HandleHttpRequest.class);
 
     public static void handleRequest(Socket clientSocket, Optional<ObjectIdPerRequest> objectIdPerRequest) {
+        System.out.println("Vai dar merda agora!!");
         try (BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
              PrintWriter out = new PrintWriter(clientSocket.getOutputStream())) {
 
@@ -118,20 +119,21 @@ public class HandleHttpRequest {
             if (contentLength > 0) {
                 char[] buffer = new char[contentLength];
                 int bytesRead = in.read(buffer);
-
+                ResponseEntity<?> res = null;
                 if (bytesRead == contentLength) {
                     var requestBody = new String(buffer);
                     var params = new RequestParam(HttpMethod.POST, path, requestBody);
                     if (optionalObjectIdPerRequest.isPresent()) {
                         var invoker = new InvokerPerRequest(optionalObjectIdPerRequest.get());
                         logger.info("Novo Invoker!");
-                        invoker.invoke(params);
+                        logger.debug("Vai invokar");
+                        res = invoker.invoke(params);
                     } else {
                         logger.info("Invoker Estático!");
-                        Invoker.invoke(params);
+                        res = Invoker.invoke(params);
                     }
 
-                    sendPostResponse(out);
+                    if (Objects.nonNull(res)) sendPostResponse(out, res);
                 } else {
                     handleContentLengthMismatch(out);
                 }
@@ -143,11 +145,8 @@ public class HandleHttpRequest {
         }
     }
 
-    private static void sendPostResponse(PrintWriter out) {
-        var response = "HTTP/1.1 200 OK\r\n\r\n";
-        response += "Solicitação POST processada com sucesso.";
-        out.print(response);
-        out.flush();
+    private static void sendPostResponse(PrintWriter out, ResponseEntity<?> res) {
+        HttpResponse.sendJsonResponse(out, res.toJson(), res.status());
     }
 
     private static void handleContentLengthMismatch(PrintWriter out) {

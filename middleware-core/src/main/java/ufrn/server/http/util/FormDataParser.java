@@ -3,7 +3,6 @@ package ufrn.server.http.util;
 import ufrn.exceptions.BadRequestException;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -61,7 +60,7 @@ public class FormDataParser {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
             writer.write(content);
         } catch (IOException exception) {
-           throw new BadRequestException("Erro ao ler arquivo" + fileName, 400);
+            throw new BadRequestException("Erro ao ler arquivo" + fileName, 400);
         }
         return file;
     }

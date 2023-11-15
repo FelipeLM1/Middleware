@@ -3,6 +3,8 @@ package ufrn.server.marshaller;
 import com.google.gson.JsonObject;
 import ufrn.exceptions.RemoteError;
 
+import java.lang.reflect.Parameter;
+
 /**
  * An interface for marshalling and unmarshalling JSON data.
  *
@@ -31,6 +33,8 @@ public interface Marshaller {
      * @throws RemoteError If there's an error during deserialization.
      */
     Object deserialize(String body, Class<?> clazz) throws RemoteError;
+
+    public Object[] deserialize(String json, Parameter[] parameters);
 }
 
 

@@ -28,4 +28,10 @@ Content-Type: application/json
 }
 
 ###
-GET http://localhost:8080/s3
+POST http://localhost:8080/s3/add
+Content-Type: application/json
+
+{
+  "n1": 10,
+  "n2": 20
+}
