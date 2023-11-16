@@ -1,14 +1,17 @@
 package ufrn.start;
 
+import java.io.IOException;
+import java.util.Objects;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import ufrn.broker.BrokerRequestHandler;
+import ufrn.client.AppStarter;
 import ufrn.configuration.ApplicationPropertiesReader;
 import ufrn.configuration.LifecyclePattern;
 import ufrn.configuration.MiddlewareProperties;
-import ufrn.server.ClientRequestHandler;
 import ufrn.server.ServerRequestHandler;
-
-import java.util.Objects;
 
 /**
  * Main entry point for the Middleware application.
@@ -28,22 +31,28 @@ public class MiddlewareApplication {
     private static final Logger logger = LoggerFactory.getLogger(MiddlewareApplication.class);
 
     public static void run() {
-        MiddlewareBanner.printBanner();
-        logger.info("Iniciando Middleware...");
-        if(Objects.equals(MiddlewareProperties.TYPE.getValue(), "SERVER"))
+        
+        if(Objects.equals(MiddlewareProperties.TYPE.getValue(), "SERVER")) {
+        	MiddlewareBanner.printBanner();
+        	logger.info("Iniciando Middleware...");
             startApplication();
-        else
-            connectApplication();
+        
+        } else if(Objects.equals(MiddlewareProperties.PROTOCOL.getValue(), "MQTT") && 
+        		Objects.equals(MiddlewareProperties.TYPE.getValue(), "BROKER")) {
+            startBroker();
+        
+        }else if(Objects.equals(MiddlewareProperties.PROTOCOL.getValue(), "MQTT") &&
+        		Objects.equals(MiddlewareProperties.TYPE.getValue(), "CLIENT"))
+            startMQTTClient();
     }
 
-    public static void run(String PathFileConfiguration) {
+	public static void run(String PathFileConfiguration) {
         MiddlewareBanner.printBanner();
         logger.info("Iniciando Middleware...");
         ApplicationPropertiesReader.setPathFileConfiguration(PathFileConfiguration);
+        
         if(Objects.equals(MiddlewareProperties.TYPE.getValue(), "SERVER"))
             startApplication();
-        else
-            connectApplication();
     }
 
     private static void startApplication() {
@@ -52,9 +61,16 @@ public class MiddlewareApplication {
         ServerRequestHandler.start(startTime);
     }
 
-    private static void connectApplication() {
-        //if (LifecyclePattern.isStaticInstances()) MiddlewareRegisterServices.start();
-        ClientRequestHandler.start();
-    }
+    private static void startMQTTClient() {
+		AppStarter.start();
+	}
+
+	private static void startBroker() {
+		try {
+			BrokerRequestHandler.iniciarServidorMQTT();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
 }

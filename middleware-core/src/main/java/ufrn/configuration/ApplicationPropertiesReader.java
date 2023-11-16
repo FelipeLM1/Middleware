@@ -1,12 +1,12 @@
 package ufrn.configuration;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility class for reading properties from the "application.properties" file.
@@ -29,10 +29,19 @@ public class ApplicationPropertiesReader {
 
     static {
         logger = LoggerFactory.getLogger(ApplicationPropertiesReader.class);
-        try (InputStream input = new FileInputStream("ApplicationS3/src/main/resources/application.properties")) {
-            properties.load(input);
-        } catch (IOException e) {
-            logger.error(e.getMessage());
+        
+        try {
+			properties.load(new FileInputStream("application.properties"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+        
+        if (properties == null || properties.isEmpty()) {
+	        try (InputStream input = new FileInputStream("ApplicationS3/src/main/resources/application.properties")) {
+	            properties.load(input);
+	        } catch (IOException e) {
+	            logger.error(e.getMessage());
+	        }
         }
     }
 
