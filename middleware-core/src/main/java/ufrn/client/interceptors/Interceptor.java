@@ -7,9 +7,9 @@ package ufrn.client.interceptors;
 public interface Interceptor {
 
 	/** Ação que será executada antes do envio de uma mensagem. */
-	public byte[] preEnvio(byte[] mqttMessage);
+	public byte[] before(byte[] mqttMessage);
 	
 	/** Ação que será executada após o envio de uma mensagem. */
-	public byte[] posEnvio(byte[] mqttMessage);
+	public byte[] after(byte[] mqttMessage);
 	
 }

@@ -141,7 +141,7 @@ public class Requestor {
 	    
 		if (interceptors != null) {
 			for (Interceptor i : interceptors) {
-				mqttMessage = i.preEnvio(mqttMessage);
+				mqttMessage = i.before(mqttMessage);
 			}
 		}
 		
@@ -149,7 +149,7 @@ public class Requestor {
 		
 		if (interceptors != null) {
 			for (Interceptor i : interceptors) {
-				mqttMessage = i.posEnvio(mqttMessage);
+				mqttMessage = i.after(mqttMessage);
 			}
 		}
 	}

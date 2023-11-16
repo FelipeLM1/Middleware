@@ -13,7 +13,7 @@ import ufrn.exceptions.CredenciaisInvalidasException;
 public class BrokerAuthenticationInterceptor implements Interceptor {
 
 	@Override
-	public Message preRecebimento(Message m) throws CredenciaisInvalidasException {
+	public Message before(Message m) throws CredenciaisInvalidasException {
 		//Verifica se é uma mensagem de conexão e insere as credenciais na mensagem
 		
 		if (m.getCabecalho().getMessageType() == BrokerMarshaller.MESSAGE_TYPE_CONNECTION) {
@@ -34,7 +34,7 @@ public class BrokerAuthenticationInterceptor implements Interceptor {
 	}
 
 	@Override
-	public Message posRecebimento(Message m) {
+	public Message after(Message m) {
 		//Não é necessária nenhuma ação
 		return m;
 	}

@@ -9,9 +9,9 @@ import ufrn.broker.entities.Message;
 public interface Interceptor {
 
 	/** Ação que será executada antes do envio de uma mensagem. */
-	public Message preRecebimento(Message m) throws Exception;
+	public Message before(Message m) throws Exception;
 	
 	/** Ação que será executada após o envio de uma mensagem. */
-	public Message posRecebimento(Message m) throws Exception;
+	public Message after(Message m) throws Exception;
 	
 }

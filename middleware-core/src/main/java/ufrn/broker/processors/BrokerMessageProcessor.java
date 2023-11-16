@@ -92,7 +92,7 @@ public abstract class BrokerMessageProcessor {
 	private void interceptacoesPrevias(Message m) throws Exception {
 		if (interceptors != null) {
 			for (Interceptor i : interceptors) {
-				m = i.preRecebimento(m);
+				m = i.before(m);
 			}
 		}
 	}
@@ -101,7 +101,7 @@ public abstract class BrokerMessageProcessor {
 	private void interceptacoesPosteriores(Message m) throws Exception {
 		if (interceptors != null) {
 			for (Interceptor i : interceptors) {
-				m = i.posRecebimento(m);
+				m = i.after(m);
 			}
 		}
 	}

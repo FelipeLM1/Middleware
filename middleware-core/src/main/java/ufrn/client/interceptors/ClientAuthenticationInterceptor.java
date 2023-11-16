@@ -14,7 +14,7 @@ import ufrn.utils.ArrayUtils;
 public class ClientAuthenticationInterceptor implements Interceptor {
 
 	@Override
-	public byte[] preEnvio(byte[] mqttMessage) {
+	public byte[] before(byte[] mqttMessage) {
 		//Verifica se é uma mensagem de conexão e insere as credenciais na mensagem
 		if (mqttMessage[0] == ClientMarshaller.MESSAGE_TYPE_CONNECTION) {
 			
@@ -47,7 +47,7 @@ public class ClientAuthenticationInterceptor implements Interceptor {
 	}
 
 	@Override
-	public byte[] posEnvio(byte[] mqttMessage) {
+	public byte[] after(byte[] mqttMessage) {
 		//Não é necessária nenhuma ação
 		return mqttMessage;
 	}
