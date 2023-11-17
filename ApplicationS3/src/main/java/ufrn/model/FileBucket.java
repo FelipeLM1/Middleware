@@ -4,16 +4,16 @@ import java.io.File;
 
 public class FileBucket {
 
-    private final String name;
+    private final String bucketName;
     private final File file;
 
-    public FileBucket(String name, File file) {
-        this.name = name;
+    public FileBucket(String bucketName, File file) {
+        this.bucketName = bucketName;
         this.file = file;
     }
 
-    public String getName() {
-        return name;
+    public String getBucketName() {
+        return bucketName;
     }
 
     public File getFile() {

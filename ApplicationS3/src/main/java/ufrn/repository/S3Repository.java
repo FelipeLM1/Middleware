@@ -26,7 +26,7 @@ public class S3Repository {
     public FileBucket getFile(String bucketName, String filename) {
         return bucketRepository.get(bucketName)
                 .stream()
-                .filter(fileBucket -> fileBucket.getName().equals(filename))
+                .filter(fileBucket -> fileBucket.getBucketName().equals(filename))
                 .findFirst().orElseThrow();
     }
 

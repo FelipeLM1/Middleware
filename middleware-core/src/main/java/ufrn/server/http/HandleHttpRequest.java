@@ -17,6 +17,7 @@ import ufrn.utils.enums.HttpMethod;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -64,7 +65,7 @@ public class HandleHttpRequest {
             String path,
             Optional<ObjectIdPerRequest> optionalObjectIdPerRequest) {
 
-        var params = new RequestParam(HttpMethod.GET, path, null);
+        var params = new RequestParam(HttpMethod.GET, path, "");
         ResponseEntity<?> res;
 
         if (optionalObjectIdPerRequest.isPresent()) {
@@ -83,7 +84,8 @@ public class HandleHttpRequest {
     private static void handlePostRequest(
             BufferedReader in,
             PrintWriter out,
-            String path, Optional<ObjectIdPerRequest> optionalObjectIdPerRequest)
+            String path,
+            Optional<ObjectIdPerRequest> optionalObjectIdPerRequest)
             throws IOException {
 
         var headerReader = new ReadHttpHeader();
@@ -95,20 +97,26 @@ public class HandleHttpRequest {
         if (contentType.equals(ContentType.JSON.getDescription())) {
             handleJsonPost(in, out, path, contentLengthHeader, optionalObjectIdPerRequest);
         } else if (contentType.equals(ContentType.MULTIPART_FORM_DATA.getDescription())) {
-            handleFormDataPost(in, out);
+            handleFormDataPost(in, out, path, optionalObjectIdPerRequest);
         } else {
             out.println("HTTP/1.1 415 Unsupported Media Type");
             out.println();
         }
     }
 
-    private static void handleFormDataPost(BufferedReader reader, PrintWriter writer) throws IOException {
-        var res = FormDataParser.parseFormData(reader);
-        File file = (File) res.get("file");
-        System.out.println(file.getName());
-        writer.println("HTTP/1.1 200 OK");
-        writer.println("Content-Type: text/plain");
-        writer.println();
+    private static void handleFormDataPost(BufferedReader reader, PrintWriter writer, String path,
+        Optional<ObjectIdPerRequest> optionalObjectIdPerRequest
+    ) throws IOException {
+        Map<String, Object> res = FormDataParser.parseFormData(reader);
+
+        RequestParam params = new RequestParam(HttpMethod.POST, path, res);
+        var response = isOptionalObjectIdPresent(optionalObjectIdPerRequest, params);
+
+        sendPostResponse(writer, response);
+
+//        writer.println("HTTP/1.1 200 OK");
+//        writer.println("Content-Type: text/plain");
+//        writer.println();
     }
 
     private static void handleJsonPost(BufferedReader in, PrintWriter out, String path, Integer contentLength,
@@ -120,18 +128,10 @@ public class HandleHttpRequest {
                 int bytesRead = in.read(buffer);
 
                 if (bytesRead == contentLength) {
-                    var requestBody = new String(buffer);
-                    var params = new RequestParam(HttpMethod.POST, path, requestBody);
-                    if (optionalObjectIdPerRequest.isPresent()) {
-                        var invoker = new InvokerPerRequest(optionalObjectIdPerRequest.get());
-                        logger.info("Novo Invoker!");
-                        invoker.invoke(params);
-                    } else {
-                        logger.info("Invoker Estático!");
-                        Invoker.invoke(params);
-                    }
-
-                    sendPostResponse(out);
+                    String requestBody = new String(buffer);
+                    RequestParam params = new RequestParam(HttpMethod.POST, path, requestBody);
+                    var res = isOptionalObjectIdPresent(optionalObjectIdPerRequest, params);
+                    sendPostResponse(out, res);
                 } else {
                     handleContentLengthMismatch(out);
                 }
@@ -143,11 +143,19 @@ public class HandleHttpRequest {
         }
     }
 
-    private static void sendPostResponse(PrintWriter out) {
-        var response = "HTTP/1.1 200 OK\r\n\r\n";
-        response += "Solicitação POST processada com sucesso.";
-        out.print(response);
-        out.flush();
+    public static ResponseEntity<?> isOptionalObjectIdPresent(Optional<ObjectIdPerRequest> objectIdPerRequest, RequestParam params) {
+        if (objectIdPerRequest.isPresent()) {
+            InvokerPerRequest invoker = new InvokerPerRequest(objectIdPerRequest.get());
+            logger.info("Novo Invoker!");
+            return invoker.invoke(params);
+        } else {
+            logger.info("Invoker Estático!");
+            return Invoker.invoke(params);
+        }
+    }
+
+    private static void sendPostResponse(PrintWriter out, ResponseEntity<?> response) {
+        HttpResponse.sendJsonResponse(out, response.toJson(), response.status());
     }
 
     private static void handleContentLengthMismatch(PrintWriter out) {

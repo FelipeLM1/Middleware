@@ -29,11 +29,11 @@ public class S3Controller {
     }
 
     @PostMapping("/s3/upload")
-    public ResponseEntity<?> uploadFile(@RequestBody FileBucket bucketName) {
+    public ResponseEntity<?> uploadFile(@RequestBody FileBucket fileBucket) {
         logger.info("Solicitação para criação de bucket...");
-        //repository.addBucket(bucketName.bucketName());
-        logger.info("Bucket {} Criado com sucesso!", bucketName);
-        return new ResponseEntity<>(200, "Bucket " + bucketName + "Criado com sucesso!", null);
+        repository.addFile(fileBucket.getBucketName(), fileBucket.getFile());
+        logger.info("Arquivo {} Criado com sucesso! {}", fileBucket.getBucketName(), fileBucket.getFile().getPath());
+        return new ResponseEntity<>(200, "Arquivo " + fileBucket.getFile().getName() + " criado com sucesso!", null);
     }
 
     @GetMapping("/s3")

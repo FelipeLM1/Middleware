@@ -3,12 +3,10 @@ package ufrn.server.http.util;
 import ufrn.exceptions.BadRequestException;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 public class FormDataParser {
-
     public static Map<String, Object> parseFormData(BufferedReader reader) throws IOException {
         Map<String, Object> formData = new HashMap<>();
 
@@ -35,13 +33,11 @@ public class FormDataParser {
                     content.append("\r\n");
                     line = reader.readLine();
                 }
-                // Extract the part name and value
+
                 String partContent = content.toString().trim();
                 String partName = headers.get("Content-Disposition").split(";")[1].trim().split("=")[1].replaceAll("\"", "");
-//                formData.put(partName, partContent);
-                // Check if the part is a file or a regular form field
+
                 if (headers.containsKey("Content-Type")) {
-                    // It's a file
                     String fileName = headers.get("Content-Disposition").split(";")[2].trim().split("=")[1].replaceAll("\"", "");
                     File file = saveToFile(partContent, fileName);
                     formData.put(partName, file);

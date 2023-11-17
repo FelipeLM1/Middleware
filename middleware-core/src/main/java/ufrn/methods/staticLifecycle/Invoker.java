@@ -6,12 +6,11 @@ import ufrn.server.RequestParam;
 import ufrn.utils.ResponseEntity;
 import ufrn.utils.enums.HttpMethod;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Utility class for invoking methods in controllers based on HTTP requests.
@@ -45,9 +44,10 @@ public class Invoker {
      **/
     public static ResponseEntity<?> invoke(RequestParam requestParam) {
 
-        var httpMethod = requestParam.httpMethod();
-        var path = requestParam.path();
-        var jsonString = requestParam.jsonString();
+        var httpMethod = requestParam.getHttpMethod();
+        var path = requestParam.getPath();
+        var jsonString = requestParam.getJsonData();
+        var formData = requestParam.getFormData();
 
         try {
             var methodOpt = ObjectIdStatic.getMethod(httpMethod, path);
@@ -58,10 +58,13 @@ public class Invoker {
                 clazz = method.getDeclaringClass();
                 var obj = clazz.getDeclaredConstructor().newInstance();
 
-                if (httpMethod.equals(HttpMethod.POST) && Objects.nonNull(jsonString)) {
+                if (httpMethod.equals(HttpMethod.POST) && requestParam.isJsonData()) {
                     args = getRequestBodyParam(method, jsonString);
                     return (ResponseEntity<?>) method.invoke(obj, args);
-                } else if (Objects.isNull(jsonString)) {
+                } else if(httpMethod.equals(HttpMethod.POST) && requestParam.isFormData()) {
+                    args = getRequestBodyFormDataParam(method, formData);
+                    return (ResponseEntity<?>) method.invoke(obj, args);
+                } else {
                     return (ResponseEntity<?>) method.invoke(obj);
                 }
 
@@ -77,7 +80,7 @@ public class Invoker {
     }
 
     private static Object getRequestBodyParam(Method method, String jsonString) {
-        Parameter parameter = findAnnotatedParameter(method, RequestBody.class);
+        Parameter parameter = findAnnotatedParameter(method);
         if (parameter != null) {
             Class<?> parameterType = parameter.getType();
             return new MarshallerImpl().deserialize(jsonString, parameterType);
@@ -85,9 +88,18 @@ public class Invoker {
         return null;
     }
 
-    private static Parameter findAnnotatedParameter(Method method, Class<? extends Annotation> annotationType) {
+    private static Object getRequestBodyFormDataParam(Method method, Map<String, Object> formData) {
+        Parameter parameter = findAnnotatedParameter(method);
+        if (parameter != null) {
+            Class<?> parameterType = parameter.getType();
+            return new MarshallerImpl().deserializeFormData(formData, parameterType);
+        }
+        return null;
+    }
+
+    private static Parameter findAnnotatedParameter(Method method) {
         return Arrays.stream(method.getParameters())
-                .filter(parameter -> parameter.isAnnotationPresent(annotationType))
+                .filter(parameter -> parameter.isAnnotationPresent(RequestBody.class))
                 .findFirst()
                 .orElse(null);
     }
