@@ -1,7 +1,10 @@
 package ufrn.utils.enums;
 
 public enum Headers {
-    CONTENT_TYPE("Content-Type"), CONTENT_LENGTH("Content-Length");
+    CONTENT_TYPE("Content-Type"),
+    CONTENT_LENGTH("Content-Length"),
+    DATE("Date"),
+    CONTENT_DISPOSITION("Content-Disposition");
 
     private final String description;
 

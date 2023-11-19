@@ -19,4 +19,12 @@ public class FileBucket {
     public File getFile() {
         return file;
     }
+
+    @Override
+    public String toString() {
+        return "{" +
+                "bucketName='" + bucketName + '\'' +
+                ", file=" + file.getName() +
+                '}';
+    }
 }

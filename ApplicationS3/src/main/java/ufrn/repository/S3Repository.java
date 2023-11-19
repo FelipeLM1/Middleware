@@ -1,5 +1,6 @@
 package ufrn.repository;
 
+import com.google.gson.Gson;
 import ufrn.model.FileBucket;
 
 import java.io.File;
@@ -7,10 +8,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class S3Repository {
 
-    static Map<String, Set<FileBucket>> bucketRepository = new HashMap<>();
+    private static final Map<String, Set<FileBucket>> bucketRepository = new ConcurrentHashMap<>();
 
     public void addBucket(String bucketName) {
         if (!bucketRepository.containsKey(bucketName)) {
@@ -18,9 +20,8 @@ public class S3Repository {
         }
     }
 
-    public boolean addFile(String bucketName, File file) {
+    public void addFile(String bucketName, File file) {
         bucketRepository.get(bucketName).add(new FileBucket(file.getName(), file));
-        return true;
     }
 
     public FileBucket getFile(String bucketName, String filename) {
@@ -31,8 +32,18 @@ public class S3Repository {
     }
 
     public String getAllBuckets() {
-        return bucketRepository.toString();
+        Map<String, Set<String>> simplifiedMap = new HashMap<>();
+
+        for (Map.Entry<String, Set<FileBucket>> entry : bucketRepository.entrySet()) {
+            Set<String> fileNames = new HashSet<>();
+            for (FileBucket fileBucket : entry.getValue()) {
+                fileNames.add(fileBucket.getFile().getName());
+            }
+            simplifiedMap.put(entry.getKey(), fileNames);
+        }
+
+        Gson gson = new Gson();
+        return gson.toJson(simplifiedMap);
+
     }
-
-
 }

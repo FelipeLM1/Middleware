@@ -82,7 +82,7 @@ public class HandleMqttRequest {
             logger.info("Invoker Estático!");
             res = Invoker.invoke(params);
         }
-        if (Objects.nonNull(res)) HttpResponse.sendJsonResponse(out, res.toJson(), res.status());
+        //if (Objects.nonNull(res)) HttpResponse.sendJsonResponse(out, res.toJson(), res.getStatus());
 
     }
 

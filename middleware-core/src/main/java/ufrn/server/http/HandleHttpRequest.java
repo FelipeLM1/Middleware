@@ -17,6 +17,7 @@ import ufrn.utils.enums.HttpMethod;
 
 import java.io.*;
 import java.net.Socket;
+import java.rmi.RemoteException;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -31,7 +32,7 @@ public class HandleHttpRequest {
 
     public static void handleRequest(Socket clientSocket, Optional<ObjectIdPerRequest> objectIdPerRequest) {
         try (BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-             PrintWriter out = new PrintWriter(clientSocket.getOutputStream())) {
+             OutputStream out = clientSocket.getOutputStream()) {
 
             String requestLine = in.readLine();
             logger.info(requestLine);
@@ -52,7 +53,7 @@ public class HandleHttpRequest {
         }
     }
 
-    private static void callRemoteMethod(Optional<ObjectIdPerRequest> objectIdPerRequest, String method, PrintWriter out, String path, BufferedReader in) throws IOException {
+    private static void callRemoteMethod(Optional<ObjectIdPerRequest> objectIdPerRequest, String method, OutputStream out, String path, BufferedReader in) throws IOException {
         switch (method) {
             case "GET" -> handleGetRequest(out, path, objectIdPerRequest);
             case "POST" -> handlePostRequest(in, out, path, objectIdPerRequest);
@@ -61,9 +62,9 @@ public class HandleHttpRequest {
     }
 
     private static void handleGetRequest(
-            PrintWriter out,
+            OutputStream out,
             String path,
-            Optional<ObjectIdPerRequest> optionalObjectIdPerRequest) {
+            Optional<ObjectIdPerRequest> optionalObjectIdPerRequest) throws RemoteException {
 
         var params = new RequestParam(HttpMethod.GET, path, "");
         ResponseEntity<?> res;
@@ -77,13 +78,13 @@ public class HandleHttpRequest {
             logger.info("Invoker Estático!");
             res = Invoker.invoke(params);
         }
-        if (Objects.nonNull(res)) HttpResponse.sendJsonResponse(out, res.toJson(), res.status());
+        if (Objects.nonNull(res)) HttpResponse.sendJsonResponse(out, res);
 
     }
 
     private static void handlePostRequest(
             BufferedReader in,
-            PrintWriter out,
+            OutputStream out,
             String path,
             Optional<ObjectIdPerRequest> optionalObjectIdPerRequest)
             throws IOException {
@@ -99,13 +100,14 @@ public class HandleHttpRequest {
         } else if (contentType.equals(ContentType.MULTIPART_FORM_DATA.getDescription())) {
             handleFormDataPost(in, out, path, optionalObjectIdPerRequest);
         } else {
-            out.println("HTTP/1.1 415 Unsupported Media Type");
-            out.println();
+            PrintWriter writer = new PrintWriter(out);
+            writer.println("HTTP/1.1 415 Unsupported Media Type");
+            writer.println();
         }
     }
 
-    private static void handleFormDataPost(BufferedReader reader, PrintWriter writer, String path,
-        Optional<ObjectIdPerRequest> optionalObjectIdPerRequest
+    private static void handleFormDataPost(BufferedReader reader, OutputStream writer, String path,
+                                           Optional<ObjectIdPerRequest> optionalObjectIdPerRequest
     ) throws IOException {
         Map<String, Object> res = FormDataParser.parseFormData(reader);
 
@@ -113,14 +115,12 @@ public class HandleHttpRequest {
         var response = isOptionalObjectIdPresent(optionalObjectIdPerRequest, params);
 
         sendPostResponse(writer, response);
-
-//        writer.println("HTTP/1.1 200 OK");
-//        writer.println("Content-Type: text/plain");
-//        writer.println();
     }
 
-    private static void handleJsonPost(BufferedReader in, PrintWriter out, String path, Integer contentLength,
+    private static void handleJsonPost(BufferedReader in, OutputStream out, String path, Integer contentLength,
                                        Optional<ObjectIdPerRequest> optionalObjectIdPerRequest) throws IOException {
+
+        PrintWriter writer = new PrintWriter(out);
 
         if (contentLength != null) {
             if (contentLength > 0) {
@@ -133,13 +133,13 @@ public class HandleHttpRequest {
                     var res = isOptionalObjectIdPresent(optionalObjectIdPerRequest, params);
                     sendPostResponse(out, res);
                 } else {
-                    handleContentLengthMismatch(out);
+                    handleContentLengthMismatch(writer);
                 }
             } else {
-                handleMissingContentLength(out);
+                handleMissingContentLength(writer);
             }
         } else {
-            handleMissingContentLengthHeader(out);
+            handleMissingContentLengthHeader(writer);
         }
     }
 
@@ -154,8 +154,8 @@ public class HandleHttpRequest {
         }
     }
 
-    private static void sendPostResponse(PrintWriter out, ResponseEntity<?> response) {
-        HttpResponse.sendJsonResponse(out, response.toJson(), response.status());
+    private static void sendPostResponse(OutputStream out, ResponseEntity<?> response) throws RemoteException {
+        HttpResponse.sendJsonResponse(out, response);
     }
 
     private static void handleContentLengthMismatch(PrintWriter out) {
@@ -173,11 +173,12 @@ public class HandleHttpRequest {
         handleServerError(out);
     }
 
-    private static void handleNotFound(PrintWriter out) {
+    private static void handleNotFound(OutputStream out) {
+        PrintWriter writer = new PrintWriter(out);
         var response = "HTTP/1.1 404 Not Found\r\n\r\n";
         response += "Página não encontrada";
-        out.print(response);
-        out.flush();
+        writer.print(response);
+        writer.flush();
     }
 
     private static void handleServerError(PrintWriter out) {

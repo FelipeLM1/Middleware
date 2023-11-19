@@ -28,7 +28,6 @@ public class DemoController {
     @PostMapping("/postTest2")
     public void postTest2(@RequestBody uploadFileReq request) {
         logger.info("chegou na rota post 2");
-
     }
 
     @PostMapping("/postTest")

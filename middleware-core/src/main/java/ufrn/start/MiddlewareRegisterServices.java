@@ -21,8 +21,8 @@ public class MiddlewareRegisterServices {
     private static final Logger logger = LoggerFactory.getLogger(MiddlewareRegisterServices.class);
 
     public static void start() {
-        logger.info("Registrando os servicos...");
+        logger.info("Registrando os métodos...");
         RequestMappingHandlerMapping.init();
-        logger.info("servicos registrados com sucesso");
+        logger.info("métodos registrados com sucesso!");
     }
 }
