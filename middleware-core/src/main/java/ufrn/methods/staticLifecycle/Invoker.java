@@ -1,8 +1,9 @@
 package ufrn.methods.staticLifecycle;
 
 import ufrn.annotations.http.RequestBody;
+import ufrn.annotations.http.RequestParam;
+import ufrn.server.HttpRequest;
 import ufrn.server.marshaller.MarshallerImpl;
-import ufrn.server.RequestParam;
 import ufrn.utils.ResponseEntity;
 import ufrn.utils.enums.HttpMethod;
 
@@ -10,7 +11,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Utility class for invoking methods in controllers based on HTTP requests.
@@ -42,15 +45,25 @@ public class Invoker {
      * Restrições:
      * Os métodos dos controllers devem ter apenas um atributo com uma anotação @RequestBody.
      **/
-    public static ResponseEntity<?> invoke(RequestParam requestParam) {
+    public static ResponseEntity<?> invoke(HttpRequest requestParam) {
 
         var httpMethod = requestParam.getHttpMethod();
         var path = requestParam.getPath();
         var jsonString = requestParam.getJsonData();
         var formData = requestParam.getFormData();
+        var isRequestParam = false;
 
         try {
+            String[] reqParams = verifyRequestParams(path);
+            Map<String, String> params = new HashMap<>();
+            if (Objects.nonNull(reqParams)) {
+                isRequestParam = true;
+                path = reqParams[0];
+                params = getRequestParams(reqParams[1]);
+            }
+
             var methodOpt = ObjectIdStatic.getMethod(httpMethod, path);
+
             Class<?> clazz;
             Object args;
             if ((methodOpt.isPresent())) {
@@ -61,9 +74,12 @@ public class Invoker {
                 if (httpMethod.equals(HttpMethod.POST) && requestParam.isJsonData()) {
                     args = getRequestBodyParam(method, jsonString);
                     return (ResponseEntity<?>) method.invoke(obj, args);
-                } else if(httpMethod.equals(HttpMethod.POST) && requestParam.isFormData()) {
+                } else if (httpMethod.equals(HttpMethod.POST) && requestParam.isFormData()) {
                     args = getRequestBodyFormDataParam(method, formData);
                     return (ResponseEntity<?>) method.invoke(obj, args);
+                } else if ((httpMethod.equals(HttpMethod.GET) && isRequestParam)) {
+                    Object[] abc = getRequestParamsValues(method, params);
+                    return (ResponseEntity<?>) method.invoke(obj, abc);
                 } else {
                     return (ResponseEntity<?>) method.invoke(obj);
                 }
@@ -76,6 +92,30 @@ public class Invoker {
             throw new RuntimeException(e);
         }
 
+        return null;
+    }
+
+    private static Object[] getRequestParamsValues(Method method, Map<String, String> params) {
+        return new MarshallerImpl().deserializeRequestParams(method, params);
+    }
+
+
+    private static Map<String, String> getRequestParams(String reqParam) {
+
+        Map<String, String> paramsMap = new HashMap<>();
+        String[] params = reqParam.split("&");
+        for (String param : params) {
+            var strParams = param.split("=");
+            paramsMap.put(strParams[0], strParams[1]);
+        }
+
+        return paramsMap;
+    }
+
+    private static String[] verifyRequestParams(String path) {
+        if (path.contains("?")) {
+            return path.split("\\?");
+        }
         return null;
     }
 

@@ -7,9 +7,8 @@ import ufrn.configuration.MiddlewareProperties;
 import ufrn.methods.perRequestLifecycle.InvokerPerRequest;
 import ufrn.methods.perRequestLifecycle.ObjectIdPerRequest;
 import ufrn.methods.staticLifecycle.Invoker;
-import ufrn.server.RequestParam;
+import ufrn.server.HttpRequest;
 import ufrn.server.http.HandleHttpRequest;
-import ufrn.server.http.HttpResponse;
 import ufrn.server.http.ReadHttpHeader;
 import ufrn.start.ScannerPerRequest;
 import ufrn.utils.ResponseEntity;
@@ -22,7 +21,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.Objects;
 import java.util.Optional;
 
 public class HandleMqttRequest {
@@ -70,7 +68,7 @@ public class HandleMqttRequest {
             String path,
             Optional<ObjectIdPerRequest> optionalObjectIdPerRequest) {
 
-        var params = new RequestParam(HttpMethod.GET, path);
+        var params = new HttpRequest(HttpMethod.GET, path);
         ResponseEntity<?> res;
 
         if (optionalObjectIdPerRequest.isPresent()) {

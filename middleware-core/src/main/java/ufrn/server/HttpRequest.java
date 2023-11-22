@@ -14,26 +14,26 @@ import java.util.Objects;
  *
  * @see HttpMethod
  */
-public class RequestParam {
+public class HttpRequest {
     HttpMethod httpMethod;
     String path;
     String jsonData;
     Map<String, Object> formData;
-    public RequestParam() {
+    public HttpRequest() {
     }
 
-    public RequestParam(HttpMethod httpMethod, String path) {
+    public HttpRequest(HttpMethod httpMethod, String path) {
         this.httpMethod = httpMethod;
         this.path = path;
     }
 
-    public RequestParam(HttpMethod httpMethod, String path, String jsonData) {
+    public HttpRequest(HttpMethod httpMethod, String path, String jsonData) {
         this.httpMethod = httpMethod;
         this.path = path;
         this.jsonData = jsonData;
     }
 
-    public RequestParam(HttpMethod httpMethod, String path, Map<String, Object> formData) {
+    public HttpRequest(HttpMethod httpMethod, String path, Map<String, Object> formData) {
         this.httpMethod = httpMethod;
         this.path = path;
         this.formData = formData;

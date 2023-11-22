@@ -7,7 +7,7 @@ import ufrn.configuration.MiddlewareProperties;
 import ufrn.methods.perRequestLifecycle.InvokerPerRequest;
 import ufrn.methods.perRequestLifecycle.ObjectIdPerRequest;
 import ufrn.methods.staticLifecycle.Invoker;
-import ufrn.server.RequestParam;
+import ufrn.server.HttpRequest;
 import ufrn.server.http.util.FormDataParser;
 import ufrn.start.ScannerPerRequest;
 import ufrn.utils.ResponseEntity;
@@ -35,7 +35,6 @@ public class HandleHttpRequest {
              OutputStream out = clientSocket.getOutputStream()) {
 
             String requestLine = in.readLine();
-            logger.info(requestLine);
 
             if (requestLine != null) {
                 String[] requestParts = requestLine.split("\\s|;");
@@ -66,7 +65,7 @@ public class HandleHttpRequest {
             String path,
             Optional<ObjectIdPerRequest> optionalObjectIdPerRequest) throws RemoteException {
 
-        var params = new RequestParam(HttpMethod.GET, path, "");
+        var params = new HttpRequest(HttpMethod.GET, path, "");
         ResponseEntity<?> res;
 
         if (optionalObjectIdPerRequest.isPresent()) {
@@ -111,7 +110,7 @@ public class HandleHttpRequest {
     ) throws IOException {
         Map<String, Object> res = FormDataParser.parseFormData(reader);
 
-        RequestParam params = new RequestParam(HttpMethod.POST, path, res);
+        HttpRequest params = new HttpRequest(HttpMethod.POST, path, res);
         var response = isOptionalObjectIdPresent(optionalObjectIdPerRequest, params);
 
         sendPostResponse(writer, response);
@@ -129,7 +128,7 @@ public class HandleHttpRequest {
 
                 if (bytesRead == contentLength) {
                     String requestBody = new String(buffer);
-                    RequestParam params = new RequestParam(HttpMethod.POST, path, requestBody);
+                    HttpRequest params = new HttpRequest(HttpMethod.POST, path, requestBody);
                     var res = isOptionalObjectIdPresent(optionalObjectIdPerRequest, params);
                     sendPostResponse(out, res);
                 } else {
@@ -143,7 +142,7 @@ public class HandleHttpRequest {
         }
     }
 
-    public static ResponseEntity<?> isOptionalObjectIdPresent(Optional<ObjectIdPerRequest> objectIdPerRequest, RequestParam params) {
+    public static ResponseEntity<?> isOptionalObjectIdPresent(Optional<ObjectIdPerRequest> objectIdPerRequest, HttpRequest params) {
         if (objectIdPerRequest.isPresent()) {
             InvokerPerRequest invoker = new InvokerPerRequest(objectIdPerRequest.get());
             logger.info("Novo Invoker!");

@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ufrn.annotations.http.RequestBody;
 import ufrn.server.marshaller.MarshallerImpl;
-import ufrn.server.RequestParam;
+import ufrn.server.HttpRequest;
 import ufrn.utils.ResponseEntity;
 import ufrn.utils.enums.HttpMethod;
 
@@ -29,7 +29,7 @@ public class InvokerPerRequest {
         this.objectIdPerRequest = objectIdPerRequest;
     }
 
-    public ResponseEntity<?> invoke(RequestParam requestParam) {
+    public ResponseEntity<?> invoke(HttpRequest requestParam) {
         var httpMethod = requestParam.getHttpMethod();
         var path = requestParam.getPath();
         var jsonString = requestParam.getJsonData();

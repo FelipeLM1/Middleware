@@ -13,6 +13,7 @@ import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.URI;
 import java.net.URL;
+import java.util.Objects;
 
 public class RegisterService {
 
@@ -24,7 +25,7 @@ public class RegisterService {
 
 
     public static void start() {
-        var enableRegisterService = enableLookupServiceDiscovery(MiddlewareProperties.APPLICATION_MAIN_CLASS.getValue());
+        var enableRegisterService = enableLookupServiceDiscovery();
         if (enableRegisterService) sendRequest();
     }
 
@@ -56,10 +57,15 @@ public class RegisterService {
         return new Gson().toJson(msg);
     }
 
-    private static boolean enableLookupServiceDiscovery(String className) {
+    private static boolean enableLookupServiceDiscovery() {
+        var className = MiddlewareProperties.APPLICATION_MAIN_CLASS.getValue();
         try {
-            Class<?> clazz = Class.forName(className);
-            return clazz.isAnnotationPresent(EnableLookupServiceDiscovery.class);
+            if(Objects.nonNull(className)) {
+                Class<?> clazz = Class.forName(className);
+                return clazz.isAnnotationPresent(EnableLookupServiceDiscovery.class);
+            }else{
+                logger.info("Lookup está desativado!");
+            }
         } catch (ClassNotFoundException e) {
             logger.error("Classe não encontrada: {}", className);
         }

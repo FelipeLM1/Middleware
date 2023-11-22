@@ -12,6 +12,7 @@
         <module>Lookup-service</module>
         <module>middleware-core</module>
         <module>ApplicationS3</module>
+        <module>ApplicationBanco</module>
     </modules>
 
     <properties>

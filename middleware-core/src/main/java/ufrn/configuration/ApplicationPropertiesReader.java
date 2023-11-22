@@ -29,15 +29,15 @@ public class ApplicationPropertiesReader {
 
     static {
         logger = LoggerFactory.getLogger(ApplicationPropertiesReader.class);
-        
+
         try {
 			properties.load(new FileInputStream("application.properties"));
 		} catch (IOException e) {
-			e.printStackTrace();
+            logger.info("Não foi encontrado arquivo de configuração no local padrão!");
 		}
-        
+
         if (properties == null || properties.isEmpty()) {
-	        try (InputStream input = new FileInputStream("ApplicationS3/src/main/resources/application.properties")) {
+	        try (InputStream input = new FileInputStream("ApplicationBanco/src/main/resources/application.properties")) {
 	            properties.load(input);
 	        } catch (IOException e) {
 	            logger.error(e.getMessage());
