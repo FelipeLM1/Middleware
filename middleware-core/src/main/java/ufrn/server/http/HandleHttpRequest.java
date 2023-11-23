@@ -41,9 +41,11 @@ public class HandleHttpRequest {
                 String method = requestParts[0];
                 String path = requestParts[1];
 
-                if (MiddlewareProperties.ACQUISITION_TYPE.getValue().equals(AcquisitionType.LAZY.name()))
-                    new ScannerPerRequest(objectIdPerRequest.orElseThrow(), method, path);
-
+                if (MiddlewareProperties.ACQUISITION_TYPE.getValue().equals(AcquisitionType.LAZY.name())) {
+                    var rawPath = path;
+                    if (rawPath.contains("?")) rawPath = path.split("\\?")[0];
+                    new ScannerPerRequest(objectIdPerRequest.orElseThrow(), method, rawPath);
+                }
                 callRemoteMethod(objectIdPerRequest, method, out, path, in);
             }
 

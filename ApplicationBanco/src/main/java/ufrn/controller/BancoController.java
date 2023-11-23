@@ -1,5 +1,7 @@
 package ufrn.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ufrn.annotations.http.GetMapping;
 import ufrn.annotations.http.PostMapping;
 import ufrn.annotations.http.RequestBody;
@@ -17,28 +19,34 @@ import ufrn.utils.ResponseEntity;
 public class BancoController {
 
     BancoService service = new BancoService(new ContaCorrenteRepository());
+    private static final Logger logger = LoggerFactory.getLogger(BancoController.class);
+
 
     @PostMapping
     public ResponseEntity<?> criarNovaConta(@RequestBody CriarConta criarConta) {
         long id = service.salvar(criarConta.nome());
+        logger.info("Conta criada!");
         return new ResponseEntity<>(200, "Salvo com sucesso!", id);
     }
 
     @PostMapping("/depositar")
     public ResponseEntity<?> depositar(@RequestBody TransacaoDto dto) throws OperacaoIlegalException {
         Double saldoRestante = service.depositar(dto);
+        logger.info("Deposito de R${} feito com sucesso!", dto.valor());
         return new ResponseEntity<>(200, "Salvo com sucesso!", saldoRestante);
     }
 
     @PostMapping("/sacar")
     public ResponseEntity<?> sacar(@RequestBody TransacaoDto dto) throws OperacaoIlegalException {
         Double saldoRestante = service.sacar(dto, TipoTransacao.SAQUE);
+        logger.info("Saque de R${} realizado!", dto.valor());
         return new ResponseEntity<>(200, "Salvo com sucesso!", saldoRestante);
     }
 
     @PostMapping("/transferencia")
     public ResponseEntity<?> transferir(@RequestBody TransferenciaDto dto) throws OperacaoIlegalException {
         Double saldoRestante = service.transferir(dto);
+        logger.info("Transferencia realizada!", dto.valor());
         return new ResponseEntity<>(200, "Salvo com sucesso!", saldoRestante);
     }
 
@@ -50,13 +58,22 @@ public class BancoController {
     @PostMapping("/remover")
     public ResponseEntity<?> remover(@RequestBody IdReq dto) {
         service.remove(dto.id());
+        logger.info("Removeu usuário com id {} ", dto.id());
         return new ResponseEntity<>(200, "Salvo com sucesso!", true);
     }
 
     @GetMapping("/get")
     public ResponseEntity<?> getById(@RequestParam(name = "id") Long id) {
         var conta = service.getById(id);
-        return new ResponseEntity<>(200, "Salvo com sucesso!", conta);
+        logger.info("Busca do usuário com id {} ", id);
+        return new ResponseEntity<>(200, "Busca realizada com sucesso!", conta);
+    }
+
+    @GetMapping("/extrato")
+    public ResponseEntity<?> getExtrato(@RequestParam(name = "id") Long id) {
+        var extrato = service.getExtrato(id);
+        logger.info("Busca do extrato com id {} ", id);
+        return new ResponseEntity<>(200, "Busca realizada com sucesso!", extrato);
     }
 
 }

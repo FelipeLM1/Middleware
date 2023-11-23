@@ -78,8 +78,8 @@ public class Invoker {
                     args = getRequestBodyFormDataParam(method, formData);
                     return (ResponseEntity<?>) method.invoke(obj, args);
                 } else if ((httpMethod.equals(HttpMethod.GET) && isRequestParam)) {
-                    Object[] abc = getRequestParamsValues(method, params);
-                    return (ResponseEntity<?>) method.invoke(obj, abc);
+                    Object[] argsParams = getRequestParamsValues(method, params);
+                    return (ResponseEntity<?>) method.invoke(obj, argsParams);
                 } else {
                     return (ResponseEntity<?>) method.invoke(obj);
                 }

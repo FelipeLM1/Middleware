@@ -6,7 +6,7 @@ public enum MiddlewareProperties {
     IP("middleware.ip"),
     PORT("middleware.port"),
     PROTOCOL("middleware.protocol"),
-    SCAN("middleware.scan.package"),
+    SCAN_PACKAGE("middleware.scan.package"),
     LIFECYCLE_PATTERN("middleware.lifecycle.pattern"),
     ACQUISITION_TYPE("middleware.lifecycle.acquisition-type"),
     LOOKUP_CLIENT_SERVICE_URL("lookup.client.serviceUrl"),

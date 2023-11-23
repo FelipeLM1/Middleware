@@ -1,8 +1,9 @@
 package ufrn.start;
 
+import ufrn.configuration.AcquisitionType;
 import ufrn.configuration.ApplicationPropertiesReader;
-import ufrn.methods.staticLifecycle.ObjectIdStatic;
 import ufrn.configuration.MiddlewareProperties;
+import ufrn.methods.staticLifecycle.ObjectIdStatic;
 
 /**
  * A class responsible for initializing and managing the request mapping for the Middleware application.
@@ -12,7 +13,7 @@ import ufrn.configuration.MiddlewareProperties;
  * for annotated methods in the specified package and registers them for handling HTTP methods. It also prints
  * the registered methods using `ObjectId.printRegisteredMethods()`.
  *
- * @see ScannerRequestMethods
+ * @see ScannerEagerRequestMethods
  * @see ObjectIdStatic
  */
 public class RequestMappingHandlerMapping {
@@ -32,8 +33,10 @@ public class RequestMappingHandlerMapping {
 
 
     private static void searchHttpMethods() {
-        ScannerRequestMethods.scanAndAddMethods(ApplicationPropertiesReader.getProperty(MiddlewareProperties.SCAN.getPropertyKey()));
-        ObjectIdStatic.printRegisteredMethods();
+        if (MiddlewareProperties.ACQUISITION_TYPE.getValue().equals(AcquisitionType.EAGER.name())) {
+            ScannerEagerRequestMethods.scanAndAddMethods(ApplicationPropertiesReader.getProperty(MiddlewareProperties.SCAN_PACKAGE.getPropertyKey()));
+            ObjectIdStatic.printRegisteredMethods();
+        }
 
     }
 }

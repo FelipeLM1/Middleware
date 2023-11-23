@@ -37,12 +37,12 @@ public class ScannerPerRequest {
     }
 
     private void scanAndAddLazyMethod(String httpMethodReq, String pathLazyMethod) {
-        this.findAllClassesUsingClassLoader(MiddlewareProperties.SCAN.getValue())
+        this.findAllClassesUsingClassLoader(MiddlewareProperties.SCAN_PACKAGE.getValue())
                 .forEach(aClass -> scanLazyMethodForAnnotations(aClass, httpMethodReq, pathLazyMethod));
     }
 
     public void scanAndAddAllMethods() {
-        this.findAllClassesUsingClassLoader(MiddlewareProperties.SCAN.getValue()).forEach(this::scanMethodsForAnnotations);
+        this.findAllClassesUsingClassLoader(MiddlewareProperties.SCAN_PACKAGE.getValue()).forEach(this::scanMethodsForAnnotations);
     }
 
     private Set<Class<?>> findAllClassesUsingClassLoader(String packageName) {

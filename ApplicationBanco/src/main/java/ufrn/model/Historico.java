@@ -38,6 +38,12 @@ public class Historico {
 
     @Override
     public String toString() {
-        return String.format("%s\t%s\tR$ %.2f", getData(), getTipo(), getValor());
+
+        return String.format("%s  %s  R$ %.2f", dataFormatada(), getTipo(), getValor());
+    }
+
+    private String dataFormatada() {
+        var dataFormatada = data.split("\\.")[0].split("T");
+        return dataFormatada[0] + " " + dataFormatada[1].replaceAll(" ", "");
     }
 }

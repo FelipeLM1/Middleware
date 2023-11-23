@@ -26,16 +26,16 @@ import java.util.stream.Collectors;
  * @see GetMapping
  * @see PostMapping
  */
-public class ScannerRequestMethods {
+public class ScannerEagerRequestMethods {
 
-    private ScannerRequestMethods() {
+    private ScannerEagerRequestMethods() {
         throw new IllegalStateException("Utility class");
     }
 
-    private static final Logger logger = LoggerFactory.getLogger(ScannerRequestMethods.class);
+    private static final Logger logger = LoggerFactory.getLogger(ScannerEagerRequestMethods.class);
 
     public static void scanAndAddMethods(String basePackage) {
-        findAllClassesUsingClassLoader(basePackage).forEach(ScannerRequestMethods::scanMethodsForAnnotations);
+        findAllClassesUsingClassLoader(basePackage).forEach(ScannerEagerRequestMethods::scanMethodsForAnnotations);
     }
 
 
