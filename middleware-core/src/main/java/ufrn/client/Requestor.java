@@ -73,7 +73,9 @@ public class Requestor {
 	 * no método subscrito.
 	 *  */
 	public void subscribe(String topic, Class<?> cls, String callBackMethodName) throws IOException {
-	    ReceiveMethodsRegister.addClassMethodToTopic(topic, cls, callBackMethodName);
+		System.out.println("Subscrevendo-se no tópico " + topic);
+		
+		ReceiveMethodsRegister.addClassMethodToTopic(topic, cls, callBackMethodName);
 		
 		byte[] mqtt_message = ClientMarshaller.createMqttSubscribeMessage(topic);
 	    enviarMensagem(mqtt_message);

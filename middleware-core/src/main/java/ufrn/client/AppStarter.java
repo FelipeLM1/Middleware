@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Set;
 
+import ufrn.client.annotations.Subscribe;
 import ufrn.client.exceptions.BrokerException;
 import ufrn.client.registers.PublishMethodsRegister;
 import ufrn.client.registers.SubscriptionsRegister;
@@ -64,17 +65,22 @@ public class AppStarter {
 	/**
 	 * Procura por métodos registrados para subscrição no sistema e realiza a invocação
 	 * desses métodos.
+	 * @throws IOException 
 	 */
-	private static void registerSubscriptions() throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+	private static void registerSubscriptions() throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, IOException {
 		//Procurando por métodos com anotação @Subscribe
-		Set<Method> subscribeMethods = SubscriptionsRegister.getSubscriptionMethods(
+		Set<Class<?>> subscribeClasses = SubscriptionsRegister.getSubscriptionClasses(
 				MiddlewareProperties.APP_PACKAGE_NAME.getValue());
 		
-		if (subscribeMethods != null && !subscribeMethods.isEmpty()) {
+		if (subscribeClasses != null && !subscribeClasses.isEmpty()) {
 			System.out.println("Registrando subscrições...");
 			
-			for (Method m : subscribeMethods) {
-		        m.invoke(null, requestor); 
+			for (Class<?> c : subscribeClasses) {
+		        String[] topics = c.getAnnotation(Subscribe.class).topics();
+				
+		        for (int i = 0; i < topics.length; i = i + 2) {
+		        	requestor.subscribe(topics[i], c, topics[i+1]);
+		        }
 		    }
 		}
 	}
