@@ -5,12 +5,12 @@ Projeto para a disciplina de Sistemas Distribuídos
 
 ### Basic Remoting 
 - [x] Server Request Handler
-- [x] Client Request Handler (Não integrado MQTT)
+- [x] Client Request Handler 
 - [x] Remoting Error
-- [x] Invoker (Não integrado MQTT)
+- [x] Invoker 
 - [x] Requestor
-- [x] Marshaller (Não integrado MQTT)
-- [x] Remote Object (Não integrado MQTT)
+- [x] Marshaller 
+- [x] Remote Object 
 
 ### Idetification
 - [x] Object ID
