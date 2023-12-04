@@ -3,14 +3,14 @@ package ufrn.model;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ContaCorrente {
+public class Conta {
 
     private Long id;
     private String nome;
     private double saldo = 0;
     private List<Historico> historico = new ArrayList<>();
 
-    public ContaCorrente(String nome) {
+    public Conta(String nome) {
         this.nome = nome;
         this.saldo = 0;
         this.historico = new ArrayList<>();

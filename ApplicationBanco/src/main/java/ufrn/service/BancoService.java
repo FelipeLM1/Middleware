@@ -4,7 +4,7 @@ import ufrn.dto.TipoTransacao;
 import ufrn.dto.TransacaoDto;
 import ufrn.dto.TransferenciaDto;
 import ufrn.exceptions.OperacaoIlegalException;
-import ufrn.model.ContaCorrente;
+import ufrn.model.Conta;
 import ufrn.model.Historico;
 import ufrn.repository.ContaCorrenteRepository;
 
@@ -20,18 +20,18 @@ public class BancoService {
 
 
     public Long salvar(String nome) {
-        return repository.save(new ContaCorrente(nome));
+        return repository.save(new Conta(nome));
     }
 
     public void remove(Long id) {
         repository.delete(id);
     }
 
-    public List<ContaCorrente> getAll() {
+    public List<Conta> getAll() {
         return repository.getAll();
     }
 
-    public ContaCorrente getById(Long id) {
+    public Conta getById(Long id) {
         return repository.getById(id);
     }
 
