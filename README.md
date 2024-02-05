@@ -1,5 +1,5 @@
 # Middleware
-Projeto para a disciplina de Sistemas Distribuídos
+O **Middleware** é um projeto de estudo que visa proporcionar uma experiência simplificada para o processamento de requisições HTTP em aplicações Java. Este middleware foi desenvolvido como parte de um projeto educacional, enfatizando a compreensão dos princípios básicos de middleware e servidores web.
 
 ## Patterns
 
